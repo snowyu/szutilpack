@@ -1,8 +1,20 @@
 sz = {
-	facedir_to_dir = { },
+	pos_alldirs = {
+		e = { x = 1, y = 0, z = 0 },
+		w = { x = -1, y = 0, z = 0 },
+		u = { x = 0, y = 1, z = 0 },
+		d = { x = 0, y = -1, z = 0 },
+		n = { x = 0, y = 0, z = 1 },
+		s = { x = 0, y = 0, z = -1 },
+	},
 	pos_zero = { x = 0, y = 0, z = 0 },
 	pos = function(x, y, z)
 		return { x = x, y = y, z = z }
+	end,
+	pos_eq = function(a, b)
+		return a.x == b.x
+			and a.y == b.y
+			and a.z == b.z
 	end,
 	pos_add = function(a, b)
 		return {
@@ -49,16 +61,12 @@ sz = {
 	end,
 	pos_norm = function(a)
 		return pos_scale(a, 1 / pos_abs(a))
-	end
-}
+	end,
 
-for k, v in pairs({
-	{ x = 1, y = 0, z = 0 },
-	{ x = -1, y = 0, z = 0 },
-	{ x = 0, y = 1, z = 0 },
-	{ x = 0, y = -1, z = 0 },
-	{ x = 0, y = 0, z = 1 },
-	{ x = 0, y = 0, z = -1 },
-	}) do
-	sz.facedir_to_dir[minetest.dir_to_facedir(v)] = v
-end
+	tbl_shuffle = function(t)
+		for i = 1, #t, 1 do
+			local j = math.random(1, #t)
+			t[i], t[j] = t[j], t[i]
+		end
+	end,
+}
