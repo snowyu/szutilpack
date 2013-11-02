@@ -1,8 +1,10 @@
-local modpath = minetest.get_modpath("sz_util");
-for k, v in pairs({
+local modname = "sz_util";
 
-	"pos",
-	"nodepos",
-	"tbl",
+-- Load the master utility base class.
+dofile(minetest.get_modpath(modname) .. "/sz_class.lua");
 
-}) do dofile(modpath .. "/" .. v .. ".lua") end
+-- Load subclasses defined in this mod.
+sz_class:loadsubclasses(modname,
+	"sz_pos",
+	"sz_facedir"
+)
