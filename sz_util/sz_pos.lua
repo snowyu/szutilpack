@@ -11,14 +11,14 @@ function sz_pos:xyz(x, y, z)
 end
 
 -- All 6 cardinal directions in 3 dimensions.
-sz_pos.dirs = {
+sz_pos.dirs = sz_table:new({
 	u = sz_pos:xyz(0, 1, 0),
 	d = sz_pos:xyz(0, -1, 0),
 	n = sz_pos:xyz(0, 0, 1),
 	s = sz_pos:xyz(0, 0, -1),
 	e = sz_pos:xyz(1, 0, 0),
 	w = sz_pos:xyz(-1, 0, 0),
-}
+})
 
 -- Create a new sz_pos from a wallmounted param2 value.
 local wm_lookup = { }
@@ -33,15 +33,7 @@ end
 -- that operate in a random direction, or more than one direction in
 -- random order.
 function sz_pos.shuffledirs()
-	local t = { }
-	for k, v in pairs(sz_pos.dirs) do
-		t[#t + 1] = v
-	end
-	for k, v in ipairs(t) do
-		local n = math.random(1, #t)
-		t[k], t[n] = t[n], v
-	end
-	return t
+	return sz_pos.dirs:values():shuffle()
 end
 
 ------------------------------------------------------------------------
@@ -53,12 +45,32 @@ function sz_pos:eq(pos)
 	return self.x == pos.x and self.y == pos.y and self.z == pos.z
 end
 
+-- Round to nearest integer coordinates.
+function sz_pos:round()
+	return sz_pos:new({
+		x = math.floor(self.x + 0.5),
+		y = math.floor(self.y + 0.5),
+		z = math.floor(self.z + 0.5)
+	})
+end
+
 -- Vector addition.
 function sz_pos:add(pos)
 	return sz_pos:new({
 		x = self.x + pos.x,
 		y = self.y + pos.y,
 		z = self.z + pos.z
+	})
+end
+
+-- Locate a random position within the given node space.  Note that we
+-- actually scatter a little less than the full node size, so that items
+-- don't get hung up on ledges.
+function sz_pos:scatter()
+	return self:round():add({
+		x = (math.random() - 0.5) * 0.5,
+		y = (math.random() - 0.5) * 0.5,
+		z = (math.random() - 0.5) * 0.5
 	})
 end
 
