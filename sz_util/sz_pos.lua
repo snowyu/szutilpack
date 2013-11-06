@@ -10,6 +10,9 @@ function sz_pos:xyz(x, y, z)
 	return sz_pos:new({ x = x, y = y, z = z })
 end
 
+-- Trivial zero vector.
+sz_pos.zero = sz_pos:xyz(0, 0, 0)
+
 -- All 6 cardinal directions in 3 dimensions.
 sz_pos.dirs = sz_table:new({
 	u = sz_pos:xyz(0, 1, 0),
@@ -180,6 +183,9 @@ end
 function sz_pos:to_wallmounted()
 	return minetest.dir_to_wallmounted(self)
 end
+
+-- Compute a hash value, for hashtable lookup use.
+sz_pos.hash = minetest.hash_node_position
 
 ------------------------------------------------------------------------
 -- NODE ACCESS
