@@ -7,15 +7,18 @@ function sz_class:new(init)
 	return init
 end
 
-function sz_class:loadsubclasses(mod, ...)
-	local modpath = minetest.get_modpath(mod) .. "/";
-	local classes = {...}
-	for i, class in ipairs(classes) do
+function sz_class:loadlibs(...)
+	local modpath = minetest.get_modpath(minetest.get_current_modname()) .. "/";
+	for i, class in ipairs({...}) do
+		dofile(modpath .. class .. ".lua")
+	end
+end
+
+function sz_class:loadsubclasses(...)
+	for i, class in ipairs({...}) do
 		local t = self:new()
 		t.__index = t
 		_G[class] = t
 	end
-	for i, class in ipairs(classes) do
-		dofile(modpath .. class .. ".lua")
-	end
+	return self:loadlibs(...)
 end

@@ -1,10 +1,9 @@
-local modname = "sz_util";
-
 -- Load the master utility base class.
-dofile(minetest.get_modpath(modname) .. "/sz_class.lua");
+dofile(minetest.get_modpath(minetest.get_current_modname())
+	.. "/sz_class.lua");
 
 -- Load subclasses defined in this mod.
-sz_class:loadsubclasses(modname,
+sz_class:loadsubclasses(
 	"sz_table",
 	"sz_pos",
 	"sz_facedir"
