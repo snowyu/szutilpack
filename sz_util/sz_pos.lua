@@ -257,7 +257,9 @@ end
 function sz_pos:item_eject(stack, speed, qty)
 	for i = 1, (qty or 1) do
 		local obj = minetest.add_item(self:scatter(), stack)
-		obj:setvelocity(sz_pos.zero:scatter():scale(speed or 0))
+		if obj then
+			obj:setvelocity(sz_pos.zero:scatter():scale(speed or 0))
+		end
 	end
 end
 
