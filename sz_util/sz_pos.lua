@@ -250,27 +250,16 @@ function sz_pos:is_empty()
 end
 
 ------------------------------------------------------------------------
--- UNDER DEVELOPMENT !!!!!!!!!!
+-- OBJECT HANDLING
 
---[[
-local solid_drawtypes = {
-	normal = true,
-	glasslike = true,
-	glasslike_framed = true,
-	allfaces = true,
-	allfaces_optional = true,
-}
--- Returns true if this node is completely solid and contains no
--- air gaps.  
--- no air gaps in it.
-function sz_nodepos:is_solid()
-	local def = self.def
-	return def ~= nil
-		and def.walkable
-		and solid_drawtypes[def.drawtype]
-		and def.liquidtype == "none"
+-- Eject items from this location, optionally flying in random
+-- directions.
+function sz_pos:item_eject(stack, speed, qty)
+	for i = 1, (qty or 1) do
+		local obj = minetest.add_item(self:scatter(), stack)
+		obj:setvelocity(sz_pos.zero:scatter():scale(speed or 0))
+	end
 end
---]]
 
 ------------------------------------------------------------------------
 return sz_pos
