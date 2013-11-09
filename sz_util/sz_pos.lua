@@ -240,7 +240,7 @@ end
 -- A safe accessor to get the groups for the node definition
 -- at this location that will always return a table.
 function sz_pos:groups()
-	return (self:nodedef() or { }).groups or { }
+	return sz_table:new((self:nodedef() or { }).groups or { })
 end
 
 -- Return true if this location contains only air.

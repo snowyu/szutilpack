@@ -8,7 +8,8 @@ function sz_class:new(init)
 end
 
 function sz_class:loadlibs(...)
-	local modpath = minetest.get_modpath(minetest.get_current_modname()) .. "/";
+	local modname = minetest.get_current_modname()
+	local modpath = minetest.get_modpath(modname) .. "/";
 	for i, class in ipairs({...}) do
 		dofile(modpath .. class .. ".lua")
 	end
