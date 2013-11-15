@@ -208,6 +208,11 @@ function sz_pos:nodedef()
 	return minetest.registered_nodes[n.name]
 end
 
+-- Get the light level at this node.
+function sz_pos:light(...)
+	return minetest.get_node_light(self, ...) or 0
+end
+
 -- Get the metadata reference for this node position.
 function sz_pos:meta(n)
 	return minetest.get_meta(self)

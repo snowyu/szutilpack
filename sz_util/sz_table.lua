@@ -25,6 +25,21 @@ function sz_table:copy()
 	return t
 end
 
+-- Merge a list of tables together into one table.  Each key in the
+-- output table will hold the value of the first input table to define
+-- a value for that key.
+function sz_table.merge(...)
+	local t = sz_table:new()
+	for i, p in ipairs({...}) do
+		for k, v in pairs(p) do
+			if t[k] == nil then
+				t[k] = v
+			end
+		end
+	end
+	return t
+end
+
 -- Create an array of all keys in this table.  This is useful for
 -- creating duplicate-free lists by using creating a t[valure] = true
 -- index, then using keys to convert it back to a {value, value...}
