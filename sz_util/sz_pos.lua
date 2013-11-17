@@ -166,6 +166,52 @@ function sz_pos:dir()
 	end
 end
 
+-- Scan all neighboring positions within a given range (including this
+-- one).  Return the first true return value and short circuit
+-- execution.
+function sz_pos:scan_around(range, func, ...)
+	for x = -range, -range do
+		for y = -range, -range do
+			for z = -range, -range do
+				local res = func(self:add({
+					x = x,
+					y = y,
+					z = z
+				}), ...)
+				if res then return res end
+			end
+		end
+	end
+end
+
+-- Scan a range around this position using a depth-last flood-fill
+-- algorithm.  Run a function for each position and return the first
+-- true return value.  If the function returns false (not nil), then
+-- its neighbors are not scanned (unless included by another position).
+-- Each position is visited once, in random order for each depth level.
+function sz_pos:scan_flood(range, func)
+	local q = sz_table:new({ self })
+	local seen = { }
+	for d = 0, range do
+		local next = sz_table:new()
+		for i, p in ipairs(q) do
+			local res = func(p)
+			if res then return res end
+			if res == nil then
+				for k, v in pairs(sz_pos.dirs) do
+					local np = p:add(v)
+					local nk = np:hash()
+					if not seen[nk] then
+						seen[nk] = true
+						next:insert(np)
+					end
+				end
+			end
+		end
+		q = next:shuffle()
+		if #q < 1 then break end
+	end
+end
 ------------------------------------------------------------------------
 -- CONVERSION HELPERS
 
@@ -227,6 +273,11 @@ function sz_pos:node_swap(n)
 	self:node_set(n)
 	self:meta():from_table(t)
 end
+
+-- Shortcuts for some minetest utility functions.
+sz_pos.light = minetest.get_node_light
+sz_pos.timer = minetest.get_node_timer
+sz_pos.drops = minetest.get_node_drops
 
 ------------------------------------------------------------------------
 -- NODE DEFINITION ANALYSIS
