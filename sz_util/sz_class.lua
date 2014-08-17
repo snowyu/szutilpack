@@ -17,7 +17,7 @@ end
 
 function sz_class:loadsubclasses(...)
 	for i, class in ipairs({...}) do
-		local t = self:new()
+		local t = self:new(_G[class])
 		t.__index = t
 		_G[class] = t
 	end
