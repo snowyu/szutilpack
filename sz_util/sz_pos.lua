@@ -332,5 +332,33 @@ end
 -- Copy the method to get objects within a radius from upstream.
 sz_pos.objects_in_radius = minetest.get_objects_inside_radius
 
+-- Hurt all entities within a radius of this location, with linear
+-- fall-off, and an optional elliptoid shape.
+function sz_pos:hitradius(r, hp, shape)
+	-- Default shape if not specified to a sphere of the
+	-- same radius as our search area.
+	if shape then
+		shape = sz_pos:new(shape):abs()
+	else
+		shape = sz_pos:xyz(r, r, r)
+	end
+
+	-- Degenerate elliptoid, no volume.  Skip the rest, since
+	-- there's no actual damage volume, and we'd divide by 0.
+	if shape.x == 0 or shape.y == 0 or shape.z == 0 then return end
+
+	-- Scan for nearby objects.
+	for k, v in pairs(self:objects_in_radius(r)) do
+		local p = self:sub(v:getpos())
+		local d = sz_pos:xyz(
+			p.x / shape.x,
+			p.y / shape.y,
+			p.z / shape.z):len()
+		if d < 1 then
+			v:set_hp(v:get_hp() - hp * (1 - d))
+		end
+	end
+end
+
 ------------------------------------------------------------------------
 return sz_pos

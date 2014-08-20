@@ -45,14 +45,12 @@ function sz_pos:shatter(reason, item)
 	-- Remove any shattered node.
 	if node then self:node_set() end
 
-	-- Any nearby entities get hurt from this.
-	-- Damage falloff is linear, meh.
-	for k, v in pairs(minetest.get_objects_inside_radius(self, 3)) do
-		local dmg = shatter_radius - self:sub(v:getpos()):len()
-		if dmg > 0 then
-			v:set_hp(v:get_hp() - dmg)
-		end
-	end
+	-- Any nearby entities get hurt from this.  Amount of damage is
+	-- related to the amount of actual shrapnel produced.
+	local dmg = 0
+	for k, v in pairs(inv) do dmg = dmg + v end
+	dmg = math.sqrt(dmg)
+	self:hitradius(dmg, dmg)
 
 	-- For each item, there is a chance it's destroyed.
 	-- For everything that's not destroyed, eject it violently.
