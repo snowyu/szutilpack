@@ -38,11 +38,7 @@ function sz_pos:limitfx(name, burst, period, func)
 	-- Do a random check for whether or not to play the FX, based
 	-- on the current quantity and burst tolerance, skip the rest
 	-- if we're not going to play.
-	if (1 + math.random() * (burst - 1)) <= nowq then
-		print("limiting fx [" .. name  .. "] at "
-			.. self:round():to_string())
-		return
-	end
+	if (1 + math.random() * (burst - 1)) <= nowq then return end
 
 	-- Update the limitfx cache.
 	limitfx_cache[cellkey] = { q = nowq + 1, t = now, p = period }

@@ -13,10 +13,11 @@ function sz_util.shatter_item(item, iterations)
 	-- with here, and put the item in the "working pile."
 	local inv = sz_table:new()
 	inv[item:get_name()] = item:get_count()
-		* (65525 - item:get_wear()) / 65535
+		* (65535 - item:get_wear()) / 65535
 
 	-- Run the specified number of iterations of recipe reversal,
 	-- choosing recipes to try at random.
+	iterations = iterations or 10
 	for pass = 1, iterations do
 		-- Make sure we have at least 1 thing to break down.
 		local ik = inv:keys()
@@ -33,11 +34,12 @@ function sz_util.shatter_item(item, iterations)
 			rec = recs[math.random(1, #recs)]
 		end
 
+
 		-- Require a valid crafting recipe.  Cooking recipes, etc.
 		-- won't work because we're going to "uncraft" the item,
 		-- not "uncook" it.
-		if rec and rec.output and rec.type == "normal"
-			or rec.type == "shapeless" then
+		if rec and rec.output and ((rec.type == "normal")
+			or (rec.type == "shapeless")) then
 
 			-- If we have more than 1, break apart a random
 			-- number of them.
@@ -59,13 +61,14 @@ function sz_util.shatter_item(item, iterations)
 			local luik = minetest.registered_items[ik]
 			local precisionok = luik and luik.groups
 				and luik.groups.precision_craft
+
 			-- Start copying the "uncrafting recipe outputs" into
 			-- a new list, and keep track of whether or not we
 			-- run into a situation that indicates that the recipe
 			-- is actually "irreversible" or that reversing it
 			-- could cause balance issues (i.e. breaking apart a
 			-- common item into rare and valuable components).
-			local newinv = { }
+			local newinv = sz_table:new()
 			local irrev = false
 			for rk, rv in pairs(rec.items) do
 				if rv and rv ~= "" then
@@ -102,7 +105,11 @@ function sz_util.shatter_item(item, iterations)
 				local t = 0
 				for rk, rv in pairs(newinv) do
 					rv = math.floor(rv)
-					newinv[rk] = rv > 0 and rn or nil
+					if rv > 0 then
+						newinv[rk] = rv
+					else
+						newinv[rk] = nil
+					end
 					t = t + rv
 				end
 

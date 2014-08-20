@@ -24,19 +24,26 @@ function sz_pos:shatter(reason, item)
 			or node.name == "ignore" or node.name == "" then
 			return
 		end
+		item = node.name
+		local def = minetest.registered_items[node.name]
+		if not def or not def.groups or not def.groups.can_shatter then return end
+		if def and def.drop and def.drop ~= "" then item = def.drop end
 	end
 
 	-- Admin log notification.
-	local msg = "shattered " .. node.name
-		.. " node at " .. self:to_string()
+	msg = item
+	if node and node.name ~= item then
+		msg = "node " .. node.name .. " -> " .. item
+	end
+	local msg = "shattered " .. msg .. " at " .. self:to_string()
 	if reason then msg = msg .. " because: " .. reason end
 	print(msg)
 
 	-- "Un-craft" the node into minute pieces.
-	local inv = sz_util.shatter_item(node.name or item)
+	local inv = sz_util.shatter_item(item)
 
 	-- Remove any shattered node.
-	if not item then self:node_set() end
+	if node then self:node_set() end
 
 	-- Any nearby entities get hurt from this.
 	-- Damage falloff is linear, meh.
@@ -60,6 +67,6 @@ function sz_pos:shatter(reason, item)
 	end
 
 	-- Play special effects.
-	pos:sound("tnt_explode")
-	pos:smoke(5, sz_pos:xyz(shatter_speed, shatter_speed, shatter_speed):scale(0.25))
+	self:sound("tnt_explode")
+	self:smoke(5, sz_pos:xyz(shatter_speed, shatter_speed, shatter_speed):scale(0.25))
 end
