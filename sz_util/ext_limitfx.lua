@@ -61,7 +61,7 @@ local function limitfx_gc()
 	local now = minetest.get_gametime()
 	local rm = { }
 	for k, v in pairs(limitfx_cache) do
-		if (v.q - (now - data.t) / data.p) <= 0 then
+		if (v.q - (now - v.t) / v.p) <= 0 then
 			rm[k] = true
 		end
 	end
