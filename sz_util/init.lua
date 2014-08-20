@@ -7,6 +7,11 @@ sz_class:loadsubclasses(
 	"sz_table"
 )
 sz_table:loadsubclasses(
+	"sz_util",
 	"sz_pos",
 	"sz_facedir"
+)
+
+sz_class:loadlibs(
+	"ext_limitfx"
 )

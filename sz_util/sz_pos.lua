@@ -166,6 +166,15 @@ function sz_pos:dir()
 	end
 end
 
+-- Get the absolute value of each coordinate.  This can be used to
+-- convert a vector into a 3D "size" for e.g. a bounding box.
+function sz_pos:abs()
+	return sz_pos:new({
+		x = (self.x >= 0) and self.x or -self.x,
+		y = (self.y >= 0) and self.y or -self.y,
+		z = (self.z >= 0) and self.z or -self.z
+	})
+end
 -- Scan all neighboring positions within a given range (including this
 -- one).  Return the first true return value and short circuit
 -- execution.
@@ -212,6 +221,7 @@ function sz_pos:scan_flood(range, func)
 		if #q < 1 then break end
 	end
 end
+
 ------------------------------------------------------------------------
 -- CONVERSION HELPERS
 
@@ -318,6 +328,9 @@ function sz_pos:item_eject(stack, speed, qty)
 		end
 	end
 end
+
+-- Copy the method to get objects within a radius from upstream.
+sz_pos.objects_in_radius = minetest.get_objects_inside_radius
 
 ------------------------------------------------------------------------
 return sz_pos
