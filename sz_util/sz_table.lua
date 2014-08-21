@@ -40,6 +40,24 @@ function sz_table.merge(...)
 	return t
 end
 
+-- Like sz_table.merge, merge a list of tables together, keeping the
+-- value for each key from the first table to define it.  This also
+-- recursively deep-merges any values which are also tables.
+function sz_table.mergedeep(...)
+	local t = sz_table:new()
+	for i, p in ipairs({...}) do
+		for k, v in pairs(p) do
+			local o = t[k]
+			if o == nil then
+				t[k] = v
+			elseif type(o) == "table" and type(v) == "table" then
+				t[k] = sz_table.mergedeep(o, v)
+			end
+		end
+	end
+	return t
+end
+
 -- Create an array of all keys in this table.  This is useful for
 -- creating duplicate-free lists by using creating a t[valure] = true
 -- index, then using keys to convert it back to a {value, value...}

@@ -9,7 +9,8 @@ sz_class:loadsubclasses(
 sz_table:loadsubclasses(
 	"sz_util",
 	"sz_pos",
-	"sz_facedir"
+	"sz_facedir",
+	"sz_nodetrans"
 )
 
 sz_class:loadlibs(

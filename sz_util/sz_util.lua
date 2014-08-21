@@ -1,6 +1,37 @@
 -- Some very basic common methods, and/or miscellany.
 
 ------------------------------------------------------------------------
+-- MODIFY NODE DEFINITIONS
+
+-- Merge modifications into a node definition.  This works for current
+-- and future registrations, by way of intercepting the
+-- minetest.register_node method.
+local nodemods = { }
+function sz_util.modify_node(name, mod)
+	local mods = nodemods[name]
+	if not mods then
+		mods = sz_table:new()
+		nodemods[name] = mods
+	end
+	mods:insert(mod)
+	local old = minetest.registered_nodes[name]
+	if old then
+		local mn = minetest.get_current_modname()
+		if name:sub(1, mn:len() + 1) ~= (mn .. ":")
+			and name:sub(1, 1) ~= ":" then
+			name = ":" .. name
+		end
+		minetest.register_node(name, sz_table.mergedeep(old, mod))
+	end
+end
+local oldreg = minetest.register_node
+minetest.register_node = function(name, def, ...)
+	local mods = nodemods[name]
+	if mods then def = sz_table.mergedeep(def, unpack(mods)) end
+	return oldreg(name, def, ...)
+end
+
+------------------------------------------------------------------------
 -- SHATTER ITEM
 
 -- Break apart an item into its constituent parts by effectively
