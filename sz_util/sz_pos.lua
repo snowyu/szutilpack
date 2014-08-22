@@ -283,17 +283,8 @@ function sz_pos:meta(n)
 	return minetest.get_meta(self)
 end
 
--- Swap the node definition without changing the metadata.
--- This works essentially the same way as "hack_swap_node" from
--- the furnace code, or the screwdriver does, by saving the old
--- metadata, placing the new node, and restoring the old meta.
-function sz_pos:node_swap(n)
-	local t = self:meta():to_table()
-	self:node_set(n)
-	self:meta():from_table(t)
-end
-
 -- Shortcuts for some minetest utility functions.
+sz_pos.node_swap = minetest.swap_node
 sz_pos.light = minetest.get_node_light
 sz_pos.timer = minetest.get_node_timer
 sz_pos.drops = minetest.get_node_drops
