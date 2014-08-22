@@ -222,6 +222,15 @@ function sz_pos:scan_flood(range, func)
 	end
 end
 
+-- A convenient wrapper for minetest.find_nodes_in_area that
+-- takes a center and radius instead of two corners.
+function sz_pos:nodes_in_area(size, ...)
+	size = sz_pos:new(size):abs()
+	local p0 = self:sub(size)
+	local p1 = self:add(size)
+	return minetest.find_nodes_in_area(p0, p1, ...)
+end
+
 ------------------------------------------------------------------------
 -- CONVERSION HELPERS
 
