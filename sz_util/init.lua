@@ -14,6 +14,7 @@ sz_table:loadsubclasses(
 )
 
 sz_class:loadlibs(
+	"string",
 	"ext_limitfx",
 	"ext_nodeshatter"
 )
