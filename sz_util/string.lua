@@ -9,3 +9,12 @@ end
 function string:endswith(suff)
 	return suff == "" or self:sub(-suff:len()) == suff
 end
+
+-- Quick helper to tell if a string contains another string
+-- anywhere inside.
+function string:contains(substr, ignorecase)
+	if ignorecase then
+		return self:lower():find(substr:lower(), 1, true)
+	end
+	return self:find(substr, 1, true)
+end

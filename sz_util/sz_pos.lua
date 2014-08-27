@@ -332,6 +332,20 @@ end
 -- Copy the method to get objects within a radius from upstream.
 sz_pos.objects_in_radius = minetest.get_objects_inside_radius
 
+-- An alternative to objects_in_radius that automatically excludes
+-- players who don't have the "interact" privilege, i.e. are effectively
+-- just spectators, and should not be "detected" by some code.
+function sz_pos:tangible_in_radius(...)
+	local t = sz_table:new()
+	for k, v in pairs(self:objects_in_radius(...)) do
+		if not v:is_player() or minetest.get_player_privs(
+			v:get_player_name()).interact then
+			t[k] = v
+		end
+	end
+	return t
+end
+
 -- Hurt all entities within a radius of this location, with linear
 -- fall-off, and an optional elliptoid shape.
 function sz_pos:hitradius(r, hp, shape)
@@ -348,7 +362,7 @@ function sz_pos:hitradius(r, hp, shape)
 	if shape.x == 0 or shape.y == 0 or shape.z == 0 then return end
 
 	-- Scan for nearby objects.
-	for k, v in pairs(self:objects_in_radius(r)) do
+	for k, v in pairs(self:tangible_in_radius(r)) do
 		local p = self:sub(v:getpos())
 		local d = sz_pos:xyz(
 			p.x / shape.x,
