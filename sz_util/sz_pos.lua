@@ -279,8 +279,13 @@ function sz_pos:light(...)
 end
 
 -- Get the metadata reference for this node position.
-function sz_pos:meta(n)
+function sz_pos:meta()
 	return minetest.get_meta(self)
+end
+
+-- Get the inventory for this node position.
+function sz_pos:inv()
+	return self:meta():get_inventory()
 end
 
 -- Shortcuts for some minetest utility functions.
