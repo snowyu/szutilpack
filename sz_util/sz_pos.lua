@@ -320,40 +320,6 @@ function sz_pos:is_empty()
 	return node and node.name == "air"
 end
 
--- Determine if the node at this position is a fluid, and measure
--- its "depth," up to a certain number of nodes above.
-function sz_pos:fluid_depth(recurse)
-	local def = self:nodedef()
-
-	-- Solid nodes have an undefined depth.
-	if not def or def.walkable then return nil end
-
-	-- Non-walkable nodes are considered "air" and have
-	-- zero depth by default.
-	local depth = 0
-
-	-- Source blocks are 9 ticks deep,
-	-- since flowing are between 1 and 8.
-	if def.liquidtype == "source" then
-		depth = 9
-
-	-- Flowing block depth is stored in param2.
-	elseif def.liquidtype == "flowing" then
-		local node = self:node_get()
-		if not node then return 0 end
-		depth = node.param2 % 8 + 1
-	end
-
-	-- If this node has a full depth, then add the depth of the
-	-- node above, up to the recursion limit.
-	if depth >= 8 and recurse and recurse > 0 then
-		local above = self:add(sz_pos.dirs.u):fluid_depth(recurse - 1)
-		if above then depth = depth + above end
-	end
-
-	return depth
-end
-
 ------------------------------------------------------------------------
 -- OBJECT HANDLING
 

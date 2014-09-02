@@ -17,5 +17,6 @@ sz_class:loadlibs(
 	"string",
 	"ext_limitfx",
 	"ext_nodeshatter",
+	"ext_environ",
 	"chatcommands"
 )
