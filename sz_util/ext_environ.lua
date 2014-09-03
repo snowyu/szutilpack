@@ -2,6 +2,7 @@
 -- features, like the presence of nearby fluids or heat sources.
 
 ------------------------------------------------------------------------
+-- FLUID DYNAMICS
 
 -- Determine if the node at this position is a fluid, and measure
 -- its "depth," up to a certain number of nodes above.
@@ -37,6 +38,55 @@ function sz_pos:fluid_depth(recurse)
 	return depth, def
 end
 
+-- Determine if there is "pressure" from a nearby fluid to "wash out" this
+-- node if it's washable.  If washout is true, returns true, the position from
+-- which washout is happening, and the definition of the node trying to do the
+-- washout.  If washout is false, returns nil.
+function sz_pos:fluid_washout(mindepth)
+	-- Check for fluids from above.  Any fluid level above will try
+	-- to descend into this node, washing out its contents.
+	local above = self:add(sz_pos.dirs.u)
+	local depth, def = above:fluid_depth()
+	if depth and depth > 0 then
+		return true, above, def
+	end
+
+	-- On each side, there must be fluid, that fluid must not have
+	-- a node below it into which the fluid would flow instead of
+	-- this one, and the fluid must have sufficient depth.
+	mindepth = mindepth or 2
+	for k, v in pairs({ sz_pos.dirs.n, sz_pos.dirs.s, sz_pos.dirs.e, sz_pos.dirs.w }) do
+		local p = self:add(v)
+		depth, def = p:fluid_depth()
+		if depth and depth > mindepth then
+			local b = p:add(sz_pos.dirs.d):node_get().name
+			if b ~= "air" and b ~= def.liquid_alternative_flowing then
+				return true, p, def
+			end
+		end
+	end
+end
+
+------------------------------------------------------------------------
+-- HEAT AND FLAME
+
+-- Determine if fire is allowed at a certain location.
+function sz_pos:fire_allowed()
+	-- Check for whether fire should extinguish at this location.
+	if fire and fire.flame_should_extinguish
+		and fire.flame_should_extinguish(self) then
+		return
+	end
+
+	-- Flames can replace air, anything flammable, and other flames.
+	-- Multiple flames are supported using the "flame" group.
+	if self:is_empty() then return true end
+	local grp = self:groups()
+	if grp.flammable or grp.flame then return true end
+end
+
+-- Helper for heat_level() that calculates the distance-adjusted
+-- contribution from a single node.
 local function heat_contrib(pos, v, group, mult)
 	if pos:eq(v) then return 0 end
 	v = sz_pos:new(v)
@@ -50,6 +100,8 @@ local function heat_contrib(pos, v, group, mult)
 	return contrib / (v:dot(v) * 3)
 end
 
+-- Calculate a "heat" level for a given node, based on contribuions from
+-- other nearby nodes, for things like environmental cooking.
 function sz_pos:heat_level()
 	local temp = 0
 
