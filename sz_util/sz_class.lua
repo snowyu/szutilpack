@@ -17,9 +17,13 @@ end
 
 function sz_class:loadsubclasses(...)
 	for i, class in ipairs({...}) do
-		local t = self:new(_G[class])
+		local t = self:new(rawget(_G, class))
 		t.__index = t
-		_G[class] = t
+		if class:sub(1, 3) == "sz_" then
+			rawset(_G, class, t)
+		else
+			_G[class] = t
+		end
 	end
 	return self:loadlibs(...)
 end
