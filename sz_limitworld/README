@@ -1,0 +1,13 @@
+Limit the size of the generated world (i.e. to limit its HDD space
+usage).  Terrain outside the generated bounds will be filled with air
+(leaving the allowed continent as a floating island), discouraging
+players from travelling much farther beyond.
+
+Players that fall outside of the world will be damaged based on
+their falling speed, to prevent them from being stuck in limbo,
+falling forever.  Travel outside the world IS allowed, if players
+do not free-fall.
+
+See init.lua for configuration details.  The only required setting
+is sz_limitworld_scale; if this is not set, the mod is effectively
+disabled.

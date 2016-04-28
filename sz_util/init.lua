@@ -15,8 +15,8 @@ sz_table:loadsubclasses(
 
 sz_class:loadlibs(
 	"string",
-	"ext_limitfx",
-	"ext_nodeshatter",
-	"ext_environ",
+	"sz_pos_environ",
+	"sz_pos_limitfx",
+	"sz_pos_nodeshatter",
 	"chatcommands"
 )

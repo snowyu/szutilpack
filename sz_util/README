@@ -1,0 +1,16 @@
+This mod provides:
+
+	- A framework for dealing with some of the most frequently-used
+	  types and operations (e.g. 3d position vectors) in an object-
+	  oriented manner (e.g. a:add(b) instead of helper.add(a, b))
+
+	- Convenience wrappers for more complex operations, many with
+	  optional parameters with sane defaults (e.g. pos:smoke())
+
+	- A few language extensions (e.g. string:startswith(prefix))
+
+	- A couple of new chat commands for debugging by mod authors
+	  (server privileges required).
+
+This mod is meant to be used as a dependency by other mods, and should
+have no direct impact on gameplay by itself.

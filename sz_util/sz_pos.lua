@@ -69,11 +69,12 @@ end
 -- Locate a random position within the given node space.  Note that we
 -- actually scatter a little less than the full node size, so that items
 -- don't get hung up on ledges.
-function sz_pos:scatter()
+function sz_pos:scatter(scale)
+	scale = scale or 0.5
 	return self:round():add({
-		x = (math.random() - 0.5) * 0.5,
-		y = (math.random() - 0.5) * 0.5,
-		z = (math.random() - 0.5) * 0.5
+		x = (math.random() - 0.5) * scale,
+		y = (math.random() - 0.5) * scale,
+		z = (math.random() - 0.5) * scale
 	})
 end
 
@@ -175,6 +176,10 @@ function sz_pos:abs()
 		z = (self.z >= 0) and self.z or -self.z
 	})
 end
+
+------------------------------------------------------------------------
+-- VOLUMETRICS
+
 -- Scan all neighboring positions within a given range (including this
 -- one).  Return the first true return value and short circuit
 -- execution.
@@ -239,8 +244,8 @@ sz_pos.to_string = minetest.pos_to_string
 sz_pos.__tostring = minetest.pos_to_string
 
 -- Lookup the "simple" facedir (not factoring in rotation) for this pos.
-function sz_pos:to_facedir()
-	return sz_facedir:from_vectors(self)
+function sz_pos:to_facedir(...)
+	return sz_facedir:from_vectors(self, ...)
 end
 
 -- Convert to a "wallmounted" direction, which is like a facedir but
@@ -278,6 +283,15 @@ function sz_pos:light(...)
 	return minetest.get_node_light(self, ...) or 0
 end
 
+-- Shortcuts for some minetest utility functions.
+sz_pos.node_swap = minetest.swap_node
+sz_pos.light = minetest.get_node_light
+sz_pos.timer = minetest.get_node_timer
+sz_pos.drops = minetest.get_node_drops
+
+------------------------------------------------------------------------
+-- NODE METADATA ACCESS
+
 -- Get the metadata reference for this node position.
 function sz_pos:meta()
 	return minetest.get_meta(self)
@@ -288,25 +302,53 @@ function sz_pos:inv()
 	return self:meta():get_inventory()
 end
 
--- Shortcuts for some minetest utility functions.
-sz_pos.node_swap = minetest.swap_node
-sz_pos.light = minetest.get_node_light
-sz_pos.timer = minetest.get_node_timer
-sz_pos.drops = minetest.get_node_drops
+-- Get both the node and metadata at this position,
+-- as pure lua serializable data.
+function sz_pos:nodemeta_get()
+	local t = self:node_get()
+	t.meta = sz_util.meta_to_lua(self:meta())
+	return t
+end
+
+-- Set both the node and metadata at this position,
+-- using a value from nodemeta_get().
+function sz_pos:nodemeta_set(nm)
+	self:node_set(nm)
+	if nm and nm.meta then
+		sz_util.lua_to_meta(nm.meta, self:meta())
+	end
+end
+
+-- Copy a node, including metadata.
+function sz_pos:node_copyto(dest)
+	return sz_pos:new(dest):nodemeta_set(self:nodemeta_get())
+end
+
+-- Move a node, including metadata, and leaving
+-- the specified content, or air, in its place.
+function sz_pos:node_moveto(dest, nodemeta)
+	self:node_copyto(dest)
+	return self:nodemeta_set(nodemeta)
+end
+
+-- Trade 2 node positions, including metadata.
+function sz_pos:node_trade(dest)
+	dest = sz_pos:new(dest)
+	return self:node_moveto(dest, dest:nodemeta_get())
+end
 
 ------------------------------------------------------------------------
 -- NODE DEFINITION ANALYSIS
 
 -- If the definition of the node at this location has a registered hook
 -- with the given name, trigger it with the given arguments.
-function sz_pos:nodedef_trigger(hook, ...)
+function sz_pos:node_signal(hook, ...)
 	local def = self:nodedef()
 	if not def then return end
 	hook = def[hook]
-	if hook then
-		return hook(...)
-	end
+	if hook then return hook(...) end
 end
+sz_pos.nodedef_trigger = sz_pos.node_signal -- Legacy name
 		
 -- A safe accessor to get the groups for the node definition
 -- at this location that will always return a table.
@@ -333,9 +375,6 @@ function sz_pos:item_eject(stack, speed, qty)
 		end
 	end
 end
-
--- Copy the method to get objects within a radius from upstream.
-sz_pos.objects_in_radius = minetest.get_objects_inside_radius
 
 -- An alternative to objects_in_radius that automatically excludes
 -- players who don't have the "interact" privilege, i.e. are effectively
@@ -378,6 +417,10 @@ function sz_pos:hitradius(r, hp, shape)
 		end
 	end
 end
+
+-- Shortcuts for some minetest utility functions.
+sz_pos.objects_in_radius = minetest.get_objects_inside_radius
+sz_pos.entity_add = minetest.add_entity
 
 ------------------------------------------------------------------------
 return sz_pos

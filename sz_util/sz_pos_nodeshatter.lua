@@ -5,14 +5,10 @@
 
 ------------------------------------------------------------------------
 
--- Some tweakable settings.
-local shatter_radius = 3
-local shatter_speed = 20
-
 -- The main helper method to actually shatter a node; it figures out
 -- the standard behavior mostly automatically.  Accepts a reason string
 -- to include in logs.
-function sz_pos:shatter(reason, item)
+function sz_pos:shatter(reason, item, lossratio, speed, sound, smoke)
 
 	-- If we're not provided an item to shatter at this location,
 	-- then we're breaking a node; get the node that's being torn
@@ -57,14 +53,15 @@ function sz_pos:shatter(reason, item)
 	for k, v in pairs(inv) do
 		local q = 0
 		for i = 1, v do
-			if math.random() <= 0.8 then q = q + 1 end
+			if math.random() <= (lossratio or 0.8) then q = q + 1 end
 		end
 		if q > 1 then
-			self:item_eject(k, shatter_speed, q)
+			self:item_eject(k, speed, q)
 		end
 	end
 
 	-- Play special effects.
-	self:sound("tnt_explode")
-	self:smoke(5, sz_pos:xyz(shatter_speed, shatter_speed, shatter_speed):scale(0.25))
+	if sound or sound ~= nil then self:sound(sound or "tnt_explode") end
+	self:smoke(5, sz_pos:xyz(speed, speed, speed):scale(0.25),
+		{texture = smoke})
 end

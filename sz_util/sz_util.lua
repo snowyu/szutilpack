@@ -6,28 +6,60 @@
 -- Merge modifications into a node definition.  This works for current
 -- and future registrations, by way of intercepting the
 -- minetest.register_node method.
-local nodemods = { }
+local nodemods = {}
 function sz_util.modify_node(name, mod)
+	-- Mods can be a table, to be merged over the original;
+	-- convert to a function.
+	if type(mod) == "table" then
+		local modtbl = mod
+		mod = function(old) return sz_table.mergedeep(modtbl, old) end
+	end
+
+	-- Mod functions should only apply to each node type once.
+	local oldmod = mod
+	local modsdone = {}
+	mod = function(def, name, ...)
+		if modsdone[name] then return def end
+		modsdone[name] = true
+		return oldmod(def, name, ...)
+	end
+
+	-- Add the mod to the mods table, for future matching
+	-- registrations.
 	local mods = nodemods[name]
 	if not mods then
 		mods = sz_table:new()
 		nodemods[name] = mods
 	end
 	mods:insert(mod)
-	local old = minetest.registered_nodes[name]
-	if old then
+
+	-- Apply the mod to any existing registrations.
+	local function modold(name, old)
 		local mn = minetest.get_current_modname()
 		if name:sub(1, mn:len() + 1) ~= (mn .. ":")
 			and name:sub(1, 1) ~= ":" then
 			name = ":" .. name
 		end
-		minetest.register_node(name, sz_table.mergedeep(old, mod))
+		minetest.register_node(name, mod(old, name))
+	end
+	if name == "*" then
+		for k, v in pairs(minetest.registered_nodes) do
+			modold(k, v)
+		end
+	else
+		modold(name, minetest.registered_nodes[name])
 	end
 end
 local oldreg = minetest.register_node
 minetest.register_node = function(name, def, ...)
-	local mods = nodemods[name]
-	if mods then def = sz_table.mergedeep(def, unpack(mods)) end
+	local function applymods(mods)
+		if not mods then return end
+		for i, v in ipairs(mods) do
+			def = v(def, name)
+		end
+	end
+	applymods(nodemods[name])
+	applymods(nodemods["*"])
 	return oldreg(name, def, ...)
 end
 
@@ -169,3 +201,71 @@ function sz_util.shatter_item(item, iterations)
 	-- the shattered items.
 	return inv
 end
+
+------------------------------------------------------------------------
+-- METADATA / PURE TABLE CONVERSION
+
+-- NodeMetaRef:to_table() apparently returns a "mixed" lua table with
+-- some userdata refs mixed in with pure lua structures.  These methods
+-- attempt to convert metadata to/from pure lua data, which can be
+-- serialized and copied around freely.
+
+-- Convert metadata to a pure lua table.
+function sz_util.meta_to_lua(meta)
+	if not meta then return end
+
+	local t = meta:to_table()
+	local o = {}
+
+	-- Copy fields, if there are any.
+	if t.fields then 
+		for k, v in pairs(t.fields) do
+			o.f = t.fields
+			break
+		end
+	end
+
+	-- Copy inventory, if there are any.
+	local i = meta:get_inventory()
+	for k, v in pairs(i:get_lists()) do
+		o.i = o.i or {}
+
+		local j = {}
+		o.i[k] = j
+
+		local s = i:get_size(k)
+		j.s = s
+
+		j.i = {}
+		for n = 0, s do
+			local x = i:get_stack(k, n)
+			if x then j.i[n] = x:to_table() end
+		end
+	end
+
+	-- Try to return nil, if possible, for an empty
+	-- metadata table, otherwise return the data.
+	for k, v in pairs(o) do return o end
+end
+
+-- Write a pure lua metadata table back into a NodeMetaRef.
+function sz_util.lua_to_meta(lua, meta)
+	-- Always clear the meta, and load the fields if any.
+	local t = {fields = {}, inventory = {}}
+	if lua and lua.f then t.fields = lua.f end
+	meta:from_table(t)
+
+	-- Load inventory, if any.
+	if lua and lua.i then
+		local i = m:get_inventory()
+		for k, v in pairs(lua.i) do
+			i:set_size(k, v.s)
+			for sk, sv in pairs(v.i) do
+				i:set_stack(ik, sk, ItemStack(sv))
+			end
+		end
+	end
+end
+
+------------------------------------------------------------------------
+return sz_util

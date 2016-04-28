@@ -1,10 +1,11 @@
 minetest.register_chatcommand("regstats", {
+	privs = {server = true},
 	description = "Statistics about total registered things.",
 	func = function(name)
 		local regpref = "registered_"
 		local regkeys = sz_table:new()
 		for k, v in pairs(core) do
-			if k:startswith(regpref) then
+			if k:startswith(regpref) and type(v) == "table" then
 				regkeys:insert(k:sub(regpref:len() + 1))
 			end
 		end
@@ -23,6 +24,7 @@ minetest.register_chatcommand("regstats", {
 
 
 minetest.register_chatcommand("regnodes", {
+	privs = {server = true},
 	description = "Statistics about total registered nodes, by mod.",
 	func = function(name)
 		local rn = sz_table:new({ TOTAL = 0 })

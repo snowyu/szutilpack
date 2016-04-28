@@ -5,21 +5,17 @@
 ------------------------------------------------------------------------
 -- SPECIAL EFFECTS RATE LIMITING
 
--- The size of cells for rate limiting; too big and some effects will
--- stand out as missing, too small and it won't have much of a useful
--- limiting effect.
-local effect_cellsize = 4
-
 -- Cache to keep track of rate limit data.
 local limitfx_cache = { }
 
--- Possibly some special effect at the given location, subject to
+-- Possibly add some special effect at the given location, subject to
 -- rate limits.  Up to "burst" effects are tolerated before limiting
 -- to about 1 effect per "period" seconds, with some random scattering.
 -- Rate limits are individual by "name", representing a distinct
 -- audio or visual signature such as "smoke" or "boom."  "func" is
--- only called if the rate limit check passes.
-function sz_pos:limitfx(name, burst, period, func)
+-- only called if the rate limit check passes.  "cell" is the size of
+-- effect volume cells over which effects are spatially combined.
+function sz_pos:limitfx(name, burst, period, func, cell)
 	local now = minetest.get_gametime()
 
 	-- Sanitize inputs.
@@ -27,7 +23,7 @@ function sz_pos:limitfx(name, burst, period, func)
 	if period <= 0 then period = 1 end
 
 	-- Look up the existing data for the given cell/name.
-	local cellkey = self:scale(1 / effect_cellsize):round():hash()
+	local cellkey = self:scale(1 / (cell or 4)):round():hash()
 		.. ":" .. name
 	local data = limitfx_cache[cellkey] or { q = 0, t = now }
 
@@ -71,16 +67,18 @@ limitfx_gc()
 -- SPECIAL EFFECTS HELPERS
 
 -- Play a sound at the location, with some sane defaults.
-function sz_pos:sound(name, spec, burst, period)
+function sz_pos:sound(name, spec, burst, period, cell)
 	spec = spec or { }
 	spec.pos = spec.pos or self
 	return self:limitfx("sound:" .. name, burst or 3, period or 0.5,
-		function() return minetest.sound_play(name, spec) end)
+		function() return minetest.sound_play(name, spec) end,
+		cell or 4)
 
 end
 
 -- Add smoke particles with some sane defaults.
-function sz_pos:smoke(qty, vel, spec, burst, period, name)
+function sz_pos:smoke(qty, vel, spec, burst, period, name, cell)
+	vel = sz_pos:new(vel or sz_pos:xyz(2, 2, 2))
 	spec = spec or { }
 	spec.amount = qty or spec.amount or 5
 	spec.time = spec.time or 0.25
@@ -94,8 +92,9 @@ function sz_pos:smoke(qty, vel, spec, burst, period, name)
 	spec.minexptime = spec.minexptime or spec.maxexptime / 2
 	spec.maxsize = spec.maxsize or 8
 	spec.minsize = spec.minsize or spec.maxsize / 2
-	spec.texture = spec.texture or "sz_util_smoke.png"
+	spec.texture = spec.texture or "tnt_smoke.png"
 	if spec.collisiondetection == nil then spec.collisiondetection = true end
 	return self:limitfx(name or "particle:smoke", burst or 5, period or 1,
-		function() return minetest.add_particlespawner(spec) end)
+		function() return minetest.add_particlespawner(spec) end,
+		cell or 4)
 end
