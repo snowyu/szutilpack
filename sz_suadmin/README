@@ -1,0 +1,11 @@
+This mod allows administering a server using a single, shared password.
+Any user who knows the password can authenticate with it and gain the
+"privs" privilege, which allows them to gain any other privilege.  This
+may be a useful alternative to using the "name" setting, which forces
+one specific account always to have all permissions.
+
+Set the sz_suadmin_password setting to the desired shared password.
+Plain-text passwords are automatically upgraded to salted hashes as
+appropriate; this may rewrite the config file at startup time.
+
+See the "/su" and "/unsu" commands for in-game admin access.
