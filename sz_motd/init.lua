@@ -25,6 +25,8 @@ readfile(seenpath, function(d) seendb = minetest.deserialize(d) end)
 -- Function to send the actual MOTD content to the player, in either
 -- automatic mod (on login) or "forced" mode (on player request).
 local function sendmotd(name, force)
+	-- Load the MOTD fresh on each request, so changes can be
+	-- made while the server is running, and take effect immediately.
 	local motd = readfile(motdpath)
 	if not motd then return end
 
@@ -44,7 +46,7 @@ local function sendmotd(name, force)
 	end
 
 	-- Send MOTD as a nicely-formatted formspec popup.
-	motd = minetest.formspec_escape(motd):gsub(",", "\,"):gsub("\n", ",")
+	motd = minetest.formspec_escape(motd):gsub("\n", ",")
 	motd = "size[12,8]textlist[0,0;11.75,7.25;motd;" .. motd
 		.. ";0;true]button_exit[0,7.5;12,1;ok;Continue]"
 	minetest.show_formspec(name, modname, motd);
