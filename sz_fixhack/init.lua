@@ -85,6 +85,12 @@ end
 
 -- Run recalculates during each cycle.
 minetest.register_globalstep(function(dtime)
+	-- Don't attempt to do anything if nobody is connected.  There seems
+	-- to be some issue that may be crashing servers that run for a long
+	-- time with no players connected, which this may help avert.
+	local players = minetest.get_connected_players()
+	if #players < 1 then return end
+
 	-- Add our allotment to the amount of time available.
 	availtime = availtime + dtime * cycletime
 
@@ -121,17 +127,14 @@ minetest.register_globalstep(function(dtime)
 	-- Skip random recalcs if we don't actually have any time to do them.
 	if endtime > starttime then
 		-- Keep searching for blocks to recalc until we run out of allotted time.
-		local players = minetest.get_connected_players()
-		if #players > 0 then
-			while os.clock() < endtime do
-				-- Pick a random player, and then pick a random exponentially-
-				-- distributed random block around that player.
-				local pos = players[math.random(1, #players)]:getpos()
-				pos.x = math.floor(pos.x / 16 + exporand() + 0.5)
-				pos.y = math.floor(pos.y / 16 + exporand() + 0.5)
-				pos.z = math.floor(pos.z / 16 + exporand() + 0.5)
-				procblock(pos, nextcalc)
-			end
+		while os.clock() < endtime do
+			-- Pick a random player, and then pick a random exponentially-
+			-- distributed random block around that player.
+			local pos = players[math.random(1, #players)]:getpos()
+			pos.x = math.floor(pos.x / 16 + exporand() + 0.5)
+			pos.y = math.floor(pos.y / 16 + exporand() + 0.5)
+			pos.z = math.floor(pos.z / 16 + exporand() + 0.5)
+			procblock(pos, nextcalc)
 		end
 	end
 
