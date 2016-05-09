@@ -150,6 +150,10 @@ end)
 
 -- Periodically display statistics, so we can track actual performance.
 local function reportstats()
+	if totaltime == 0 then
+		print(modname .. ": processing suspended")
+		return
+	end
 	local function ms(i) return math.floor(i * 1000000) / 1000 end
 	print(modname .. ": processed " .. totalqty .. " mapblocks using "
 		.. ms(proctime) .. "ms out of " .. ms(totaltime) .. "ms ("
