@@ -22,6 +22,19 @@ local seenpath = minetest.get_worldpath() .. "/" .. modname .. "_seen"
 local seendb = {}
 readfile(seenpath, function(d) seendb = minetest.deserialize(d) end)
 
+-- Calculate form dimensions (configurable) and spec strings.
+local fspref, fssuff
+do
+	local fsw = tonumber(minetest.setting_get(modname .. "_width")) or 8.5
+	local fsh = tonumber(minetest.setting_get(modname .. "_height")) or 6
+	local tbw = fsw - 0.25
+	local tbh = fsh - 0.75
+	fspref = "size[" .. fsw .. "," .. fsh .. ",true]"
+		.. "textlist[0,0;" .. tbw .. "," .. tbh .. ";motd;"
+	fssuff = ";0;true]button_exit[0," .. tbh .. ";" .. fsw
+		.. ",1;ok;Continue]"
+end
+
 -- Function to send the actual MOTD content to the player, in either
 -- automatic mod (on login) or "forced" mode (on player request).
 local function sendmotd(name, force)
@@ -46,10 +59,9 @@ local function sendmotd(name, force)
 	end
 
 	-- Send MOTD as a nicely-formatted formspec popup.
-	motd = minetest.formspec_escape(motd):gsub("\n", ",")
-	motd = "size[12,8]textlist[0,0;11.75,7.25;motd;" .. motd
-		.. ";0;true]button_exit[0,7.5;12,1;ok;Continue]"
-	minetest.show_formspec(name, modname, motd);
+	minetest.show_formspec(name, modname, fspref
+		.. minetest.formspec_escape(motd):gsub("\n", ",")
+		.. fssuff)
 
 	-- If the player had already seen the MOTD (i.e. this is a
 	-- forced request) then we don't need to update the database or

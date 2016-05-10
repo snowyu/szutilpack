@@ -94,10 +94,11 @@ minetest.register_globalstep(function(dtime)
 	-- Add our allotment to the amount of time available.
 	availtime = availtime + dtime * cycletime
 
-	-- If we have a net deficit of time available, shrink it over
-	-- time, so we don't have to wait forever for it to linearly
-	-- crawl back to positive.
-	if availtime < 0 then availtime = availtime * 0.75 end
+	-- Attenuate stored surplus/deficit time, so that we don't accumulate
+	-- a massive deficit (suspending recalcs for a long time) or a massive
+	-- surplus (effectively freezing the game for a ton of redundant
+	-- recalcs).
+	availtime = availtime * 0.95
 
 	-- Calculate when the recalculation is supposed to stop, based on
 	-- real-time clock.
@@ -150,14 +151,12 @@ end)
 
 -- Periodically display statistics, so we can track actual performance.
 local function reportstats()
-	if totaltime == 0 then
-		print(modname .. ": processing suspended")
-		return
-	end
+	if totaltime == 0 then return end
 	local function ms(i) return math.floor(i * 1000000) / 1000 end
 	print(modname .. ": processed " .. totalqty .. " mapblocks using "
 		.. ms(proctime) .. "ms out of " .. ms(totaltime) .. "ms ("
-		.. (math.floor(proctime / totaltime * 10000) / 100) .. "%)")
+		.. (math.floor(proctime / totaltime * 10000) / 100)
+		.. "%), " .. ms(availtime) .. "ms saved")
 	totalqty = 0
 	totaltime = 0
 	proctime = 0
