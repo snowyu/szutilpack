@@ -1,0 +1,14 @@
+------------------------------------------------------------------------
+
+This mod smoothly syncs the in-world clock with the real-world clock,
+such that sunrise happens at :00, :20, and :40 minutes past the hour,
+so players can plan their login times onto an MP server to happen at a
+time of day conducive to starting out gameplay.
+
+The adjustments are made gradually, i.e. by speeding up or slowing down
+in-game time flow until it syncs up, and then making fine adjustments
+to keep it very close to precisely synced.  This avoids any kind of
+large distracting jumps from setting the clock, so the time of day
+advances continuously.
+
+------------------------------------------------------------------------
