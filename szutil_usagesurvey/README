@@ -1,0 +1,16 @@
+------------------------------------------------------------------------
+
+This mod maintains a summary of player interactions with the map on a
+per-mapblock, per-player basis, and records totals to a file-based
+database in a subdir of the world.
+
+Interactions include time spent standing/moving, and counts of actions
+such as nodes dug/placed, deaths/respawns, joins/leaves, hp hurt/healed,
+etc.
+
+The purpose of this data collection is to allow a server admin to
+identify valuable areas of a world map, i.e. areas that players have the
+most effort invested in, e.g. for pruning databases, prioritizing
+backups, showcasing builds, etc.
+
+------------------------------------------------------------------------

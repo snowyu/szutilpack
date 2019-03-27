@@ -1,0 +1,21 @@
+------------------------------------------------------------------------
+
+This mod exposes a console for running administrative commands on a
+UNIX-domain socket.  Multiple clients can connect and issue commands
+independently.  You can use OpenBSD's netcat (nc -U) to connect to
+the console from a regular command line.
+
+Commands issued will be run as the CONSOLE "virtual player," who is
+granted ALL permissions.  Ordinary clients cannot connect as the
+CONSOLE player name.
+
+Only immediate responses to command input are output to the socket.
+Delayed responses, other gameplay action, and chat are not sent to
+the client, and can only be seen in server logs or in-game.
+
+ *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+WARNING: For this mod to work, LuaSockets must be installed, and this
+mod must be listed in the "secure.trusted_mods" setting.
+
+------------------------------------------------------------------------

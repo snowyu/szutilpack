@@ -1,3 +1,5 @@
+------------------------------------------------------------------------
+
 Display a simple HUD meter showing an estimate of current server "lag,"
 i.e. the size of "steps" the server is running.  This allows admins to
 monitor system performance, or mod authors to monitor code performance
@@ -8,3 +10,5 @@ some parameters can be tuned.  See init.lua for configuration details.
 
 Players will see the lagometer iff they have the "lagometer" priv.
 The meter displays just above the health bar.
+
+------------------------------------------------------------------------

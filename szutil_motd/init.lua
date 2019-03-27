@@ -1,12 +1,19 @@
+-- LUALOCALS < ---------------------------------------------------------
+local io, minetest, tonumber
+    = io, minetest, tonumber
+local io_close, io_open
+    = io.close, io.open
+-- LUALOCALS > ---------------------------------------------------------
+
 local modname = minetest.get_current_modname()
 
 -- Generic function to read an entire text file, used to load
 -- the "seen" database, and to read the motd.
 local function readfile(path, trans)
-	local f = io.open(path, "rb")
+	local f = io_open(path, "rb")
 	if f then
 		local d = f:read("*all")
-		f:close()
+		io_close(f)
 		if trans then return trans(d) end
 		return d
 	end
@@ -30,13 +37,13 @@ do
 	local tbw = fsw - 0.25
 	local tbh = fsh - 0.75
 	fspref = "size[" .. fsw .. "," .. fsh .. ",true]"
-		.. "textlist[0,0;" .. tbw .. "," .. tbh .. ";motd;"
+	.. "textlist[0,0;" .. tbw .. "," .. tbh .. ";motd;"
 	fssuff = ";0;true]button_exit[0," .. tbh .. ";" .. fsw
-		.. ",1;ok;Continue]"
+	.. ",1;ok;Continue]"
 end
 
 -- Function to send the actual MOTD content to the player, in either
--- automatic mod (on login) or "forced" mode (on player request).
+-- automatic mode (on login) or "forced" mode (on player request).
 local function sendmotd(name, force)
 	-- Load the MOTD fresh on each request, so changes can be
 	-- made while the server is running, and take effect immediately.
@@ -72,10 +79,10 @@ local function sendmotd(name, force)
 	-- so we don't send another copy of the same content to the
 	-- same player automatically.
 	seendb[name] = hash
-	local f = io.open(seenpath, "wb")
+	local f = io_open(seenpath, "wb")
 	if f then
 		f:write(minetest.serialize(seendb))
-		f:close()
+		io_close(f)
 	end
 
 	-- Remind the player where they can get the MOTD if they

@@ -1,0 +1,20 @@
+------------------------------------------------------------------------
+
+This mod exposes a UNIX-domain socket for integrating arbitrary external
+chat relay systems.  You can use OpenBSD's netcat (nc -U) to connect to
+the console from a regular command line, though the preferred way is to
+connect a bridge program to act as a client for both this socket and the
+external chat system.
+
+The communication protocol is simple: all in-game chat (including emote,
+player join/leave, etc) messages will be broadcast to all connected
+socket clients.  Each line of input text received (newline-terminated)
+from any socket client will be displayed in-game and broadcast to all
+other connected socket clients.
+
+ *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+
+WARNING: For this mod to work, LuaSockets must be installed, and this
+mod must be listed in the "secure.trusted_mods" setting.
+
+------------------------------------------------------------------------

@@ -1,3 +1,10 @@
+-- LUALOCALS < ---------------------------------------------------------
+local error, math, minetest, os, pcall
+    = error, math, minetest, os, pcall
+local math_random, os_time
+    = math.random, os.time
+-- LUALOCALS > ---------------------------------------------------------
+
 local modname = minetest.get_current_modname()
 
 ------------------------------------------------------------------------
@@ -15,7 +22,7 @@ local function gensalt()
 	local alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 	local salt = ""
 	while salt:len() < hashlen do
-		local n = math.random(1, alpha:len())
+		local n = math_random(1, alpha:len())
 		salt = salt .. alpha:sub(n, n)
 	end
 	return salt
@@ -55,7 +62,7 @@ upgradepass(minetest.setting_save)
 --	- Users with "server" privs (who can use /set) but without "privs"
 --	  privs cannot exploit certain known settings to gain "privs" access.
 if minetest.chatcommands and minetest.chatcommands.set
-	and minetest.chatcommands.set.func then
+and minetest.chatcommands.set.func then
 	local prefix = modname .. "_"
 	local oldfunc = minetest.chatcommands.set.func
 	minetest.chatcommands.set.func = function(name, ...)
@@ -109,37 +116,52 @@ local function changeprivs(name, priv)
 	privs.privs = priv
 	minetest.set_player_privs(name, privs)
 	return true, "Privileges of " .. name .. ": "
-		.. minetest.privs_to_string(minetest.get_player_privs(name))
+	.. minetest.privs_to_string(minetest.get_player_privs(name))
 end
+
+-- Keep track of last attempt, and apply a short delay to rate-limit
+-- players trying to brute-force passwords.
+local retry = {}
 
 -- Register /su command to escalate privs by password.  The argument is the
 -- password, which must match the one configured.  If no password is configured,
 -- then the command will always return failure.
 minetest.register_chatcommand("su", {
-	description = "Escalate privileges by password.",
-	func = function(name, pass)
-		if minetest.check_player_privs(name, {privs = true}) then
-			return false, "You are already a superuser."
-		end
-		local hash = minetest.setting_get(modname .. "_password_hash")
-		local salt = minetest.setting_get(modname .. "_password_salt")
-		if not pass or pass == ""
+		description = "Escalate privileges by password.",
+		func = function(name, pass)
+			-- Check for already admin.
+			if minetest.check_player_privs(name, {privs = true}) then
+				return false, "You are already a superuser."
+			end
+
+			-- Check rate limit.
+			local now = os_time()
+			if retry[name] and now < (retry[name] + 5) then
+				return false, "Wait a few seconds before trying again."
+			end
+			retry[name] = now
+
+			-- Check password.
+			local hash = minetest.setting_get(modname .. "_password_hash")
+			local salt = minetest.setting_get(modname .. "_password_salt")
+			if not pass or pass == ""
 			or not hash or hash == ""
 			or not salt or salt == ""
 			or minetest.get_password_hash(salt, pass) ~= hash then
-			return false, "Authentication failure."
+				return false, "Authentication failure."
+			end
+
+			return changeprivs(name, true)
 		end
-		return changeprivs(name, true)
-	end
-})
+	})
 
 -- A shortcut to exit "su mode"; this is really just a shortcut for
 -- "/revoke <me> privs", which escalated users will be able to do.
 minetest.register_chatcommand("unsu", {
-	description = "Shortcut to de-escalate privileges from su.",
-	privs = {privs = true},
-	func = function(name) return changeprivs(name) end
-})
+		description = "Shortcut to de-escalate privileges from su.",
+		privs = {privs = true},
+		func = function(name) return changeprivs(name) end
+	})
 
 ------------------------------------------------------------------------
 -- STRICT MODE ENFORCEMENT

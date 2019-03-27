@@ -1,0 +1,14 @@
+------------------------------------------------------------------------
+
+This mod displays a pop-up message to players automatically upon login
+using a nice formspec interface.  Messages are only displayed
+automatically if changed since the last viewing, or if the player has
+never seen the message before.  Players can summon the message manually
+with a chat command.
+
+This can be used to display server rules, hints, and/or news on player
+login.  The form is designed for 72-column hand-wrapped text, and
+displays using minetest's proportional font (indentations do not
+necessarily line up).
+
+------------------------------------------------------------------------
