@@ -11,7 +11,7 @@ falling forever.  Travel outside the world IS allowed, if players
 do not free-fall.
 
 See init.lua for configuration details.  The only required setting
-is sz_limitworld_scale; if this is not set, the mod is effectively
+is szutil_limitworld_scale; if this is not set, the mod is effectively
 disabled.
 
 ------------------------------------------------------------------------

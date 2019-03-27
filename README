@@ -1,3 +1,10 @@
+------------------------------------------------------------------------
+
 A collection of miscellaneous mods for minetest providing "utility"
 functonality: management features, bug workarounds, and libraries for
 other mods.  See each individual mod's README for more detail.
+
+Each mod is designed to work completely standalone and without any
+dependencies, including on any specific base game.
+
+------------------------------------------------------------------------

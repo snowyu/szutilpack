@@ -6,10 +6,10 @@ Any user who knows the password can authenticate with it and gain the
 may be a useful alternative to using the "name" setting, which forces
 one specific account always to have all permissions.
 
-Set the sz_suadmin_password setting to the desired shared password.
+Set the szuil_suadmin_password setting to the desired shared password.
 Plain-text passwords are automatically upgraded to salted hashes as
 appropriate; this may rewrite the config file at startup time.  Enable
-the sz_suadmin_strict setting to require a /su password to access
+the szuil_suadmin_strict setting to require a /su password to access
 the "privs" privilege; users are strippd of it on login/logout
 automatically.
 
