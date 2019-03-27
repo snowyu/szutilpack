@@ -39,7 +39,7 @@ minetest.log(modname .. ": falling critical speed " .. fallspeed
 ------------------------------------------------------------------------
 -- NODE CONTENT ID'S
 
-local c_air, s_solid;
+local c_air, c_solid;
 local c_liquid = {}
 minetest.after(0, function()
 		c_air = minetest.get_content_id("air")
