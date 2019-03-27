@@ -15,7 +15,7 @@ local center = minetest.setting_get_pos(modname .. "_center") or {x = 0, y = 0, 
 
 -- Size/apsect of elliptoid (radii in each direction) in which terrain is allowed.
 local scale = minetest.setting_get_pos(modname .. "_scale")
-if not scale then return end
+if (not scale) or (scale.x == 0) or (scale.y == 0) or (scale.z == 0) then return end
 
 -- Size/aspect of "inner" elliptoid in which liquids are allowed.  The outer
 -- shell of the world elliptoid will be a "margin" area in which liquids are
