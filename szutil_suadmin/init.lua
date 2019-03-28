@@ -142,8 +142,8 @@ minetest.register_chatcommand("su", {
 			retry[name] = now
 
 			-- Check password.
-			local hash = minetest.settings.get(modname .. "_password_hash")
-			local salt = minetest.settings.get(modname .. "_password_salt")
+			local hash = minetest.settings:get(modname .. "_password_hash")
+			local salt = minetest.settings:get(modname .. "_password_salt")
 			if not pass or pass == ""
 			or not hash or hash == ""
 			or not salt or salt == ""
