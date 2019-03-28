@@ -169,3 +169,4 @@ local function reportstats()
 	minetest.after(stattime, reportstats)
 end
 minetest.after(stattime, reportstats)
+minetest.register_on_shutdown(reportstats)
