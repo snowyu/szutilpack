@@ -82,8 +82,7 @@ local function procblock(pos, nextcalc)
 	-- Recalc all fluids and lighting in that block.
 	local vm = minetest.get_voxel_manip(blockmin(pos), blockmax(pos))
 	vm:update_liquids()
-	vm:calc_lighting()
-	vm:write_to_map()
+	vm:write_to_map(true)
 	vm:update_map()
 
 	-- Keep track for periodic statistic summary.
