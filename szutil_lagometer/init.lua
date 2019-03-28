@@ -10,12 +10,12 @@ local modname = minetest.get_current_modname()
 -- How often to publish updates to players.  Too infrequent and the meter
 -- is no longer as "real-time", but too frequent and they'll get bombarded
 -- with HUD change packets.
-local interval = tonumber(minetest.setting_get(modname .. "_interval")) or 2
+local interval = tonumber(minetest.settings:get(modname .. "_interval")) or 2
 
 -- The "fall-off ratio" to multiply the previous lag values by each tick.
 -- Lag spikes will set the lag estimate high, and multiplying by this fall-off
 -- ratio is the only way it will fall back down.
-local falloff = tonumber(minetest.setting_get(modname .. "_falloff")) or 0.99
+local falloff = tonumber(minetest.settings:get(modname .. "_falloff")) or 0.99
 
 -- Keep track of our estimate of server lag.
 local lag = 0

@@ -10,13 +10,13 @@ local modname = minetest.get_current_modname()
 -- Proportion of time to spend each cycle on recalculations.  For instance,
 -- a value of 0.05 will mean that we attempt to use about 5% of each step
 -- cycle trying to do recalculates.
-local cycletime = tonumber(minetest.setting_get(modname .. "_cycletime")) or 0.02
+local cycletime = tonumber(minetest.settings:get(modname .. "_cycletime")) or 0.02
 
 -- How often statistics are written to the log, to track server CPU use.
-local stattime = tonumber(minetest.setting_get(modname .. "_stattime")) or 3600
+local stattime = tonumber(minetest.settings:get(modname .. "_stattime")) or 3600
 
 -- How often a mapblock can be recalculated, at the earliest.
-local calctime = tonumber(minetest.setting_get(modname .. "_calctime")) or 60
+local calctime = tonumber(minetest.settings:get(modname .. "_calctime")) or 60
 
 -- Simple positional helper functions.
 local function posadd(a, b) return {x = a.x + b.x, y = a.y + b.y, z = a.z + b.z} end

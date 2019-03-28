@@ -32,8 +32,8 @@ readfile(seenpath, function(d) seendb = minetest.deserialize(d) end)
 -- Calculate form dimensions (configurable) and spec strings.
 local fspref, fssuff
 do
-	local fsw = tonumber(minetest.setting_get(modname .. "_width")) or 8.5
-	local fsh = tonumber(minetest.setting_get(modname .. "_height")) or 6
+	local fsw = tonumber(minetest.settings:get(modname .. "_width")) or 8.5
+	local fsh = tonumber(minetest.settings:get(modname .. "_height")) or 6
 	local tbw = fsw - 0.25
 	local tbh = fsh - 0.75
 	fspref = "size[" .. fsw .. "," .. fsh .. ",true]"

@@ -34,7 +34,7 @@ end
 -- been converted to a hash (using ~ instead of empty string so we can set
 -- the password to empty-string to disable this feature).
 local function upgradepass(changed)
-	local rawpass = minetest.setting_get(modname .. "_password")
+	local rawpass = minetest.settings:get(modname .. "_password")
 	if rawpass and rawpass ~= "~" then
 		local newsalt = ""
 		local newhash = ""
@@ -42,9 +42,9 @@ local function upgradepass(changed)
 			newsalt = gensalt()
 			newhash = minetest.get_password_hash(newsalt, rawpass)
 		end
-		minetest.setting_set(modname .. "_password", "~")
-		minetest.setting_set(modname .. "_password_salt", newsalt)
-		minetest.setting_set(modname .. "_password_hash", newhash)
+		minetest.settings:set(modname .. "_password", "~")
+		minetest.settings:set(modname .. "_password_salt", newsalt)
+		minetest.settings:set(modname .. "_password_hash", newhash)
 		if changed then return changed() end
 	end
 end
@@ -52,7 +52,7 @@ end
 -- On initial startup, if there's an unsafe password set in the config
 -- file, upgrade it automatically, and save the upgraded config so it's
 -- not exposed on disk, e.g. in backups.
-upgradepass(minetest.setting_save)
+upgradepass(function() minetest.settings:write() end)
 
 ------------------------------------------------------------------------
 -- PROTECT PRIVILEGE-RELATED SETTINGS
@@ -79,20 +79,20 @@ and minetest.chatcommands.set.func then
 		-- Wrap the built-in setting modification function to block
 		-- certain settings from being set during the execution of
 		-- this command.
-		local oldset = minetest.setting_set
-		minetest.setting_set = function(setting, ...)
+		local oldset = minetest.settings.set
+		minetest.settings.set = function(setting, ...)
 			if setting and (setting == "name"
 				or setting:sub(1, prefix:len()) == prefix) then
 				error("NEEDPRIVS")
 			end
-			return oldset(setting, ...)
+			return oldset(minetest.settings, setting, ...)
 		end
 
 		-- Helper to handle result of command pcall; report our custom
 		-- error, bubble out other errors, otherwise return normally.
 		-- Restore the normal setting modification API after the command.
 		local function postset(ok, err, ...)
-			minetest.setting_set = oldset
+			minetest.settings.set = oldset
 			if ok then
 				return err, ...
 			else
@@ -142,8 +142,8 @@ minetest.register_chatcommand("su", {
 			retry[name] = now
 
 			-- Check password.
-			local hash = minetest.setting_get(modname .. "_password_hash")
-			local salt = minetest.setting_get(modname .. "_password_salt")
+			local hash = minetest.settings.get(modname .. "_password_hash")
+			local salt = minetest.settings.get(modname .. "_password_salt")
 			if not pass or pass == ""
 			or not hash or hash == ""
 			or not salt or salt == ""
@@ -170,7 +170,7 @@ minetest.register_chatcommand("unsu", {
 -- /su to escalate to admin after login, i.e. their privs are NOT persisted
 -- after logout.
 local function strictenforce(player)
-	if not minetest.setting_getbool(modname .. "_strict") then return end
+	if not minetest.settings:get_bool(modname .. "_strict") then return end
 	if not player then return end
 	local name = player:get_player_name()
 	if not name then return end

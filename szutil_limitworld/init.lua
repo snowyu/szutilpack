@@ -20,7 +20,7 @@ if (not scale) or (scale.x == 0) or (scale.y == 0) or (scale.z == 0) then return
 -- Size/aspect of "inner" elliptoid in which liquids are allowed.  The outer
 -- shell of the world elliptoid will be a "margin" area in which liquids are
 -- converted to solid to keep them from flowing out.
-local margin = tonumber(minetest.setting_get(modname .. "_margin")) or 2
+local margin = tonumber(minetest.settings:get(modname .. "_margin")) or 2
 if scale.x <= margin or scale.y <= margin or scale.z <= margin then return end
 local iscale = { x = scale.x - margin, y = scale.y - margin, z = scale.z - margin }
 
@@ -28,10 +28,10 @@ minetest.log(modname .. ": scale " .. minetest.pos_to_string(scale) .. " center 
 	.. minetest.pos_to_string(center) .. " margin " .. margin)
 
 -- Critical speed at which falling off the world damages players.
-local fallspeed = tonumber(minetest.setting_get(modname .. "_fallspeed")) or 20
+local fallspeed = tonumber(minetest.settings:get(modname .. "_fallspeed")) or 20
 
 -- Relative rate of damage (linear with airspeed) for falling-off-world damage.
-local falldamage = tonumber(minetest.setting_get(modname .. "_falldamage")) or 0.25
+local falldamage = tonumber(minetest.settings:get(modname .. "_falldamage")) or 0.25
 
 minetest.log(modname .. ": falling critical speed " .. fallspeed
 	.. " damage rate " .. falldamage)
