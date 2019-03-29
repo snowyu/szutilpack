@@ -1,8 +1,8 @@
 -- LUALOCALS < ---------------------------------------------------------
 local math, minetest, os, tonumber
-= math, minetest, os, tonumber
+    = math, minetest, os, tonumber
 local math_floor, math_random, os_date
-= math.floor, math.random, os.date
+    = math.floor, math.random, os.date
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()

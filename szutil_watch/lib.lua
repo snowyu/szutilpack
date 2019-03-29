@@ -1,6 +1,6 @@
 -- LUALOCALS < ---------------------------------------------------------
-local minetest, pairs, rawset, type, vector
-= minetest, pairs, rawset, type, vector
+local minetest, pairs, rawset, type
+    = minetest, pairs, rawset, type
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()

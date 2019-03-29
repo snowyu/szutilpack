@@ -1,8 +1,8 @@
 -- LUALOCALS < ---------------------------------------------------------
-local minetest, pairs, string, tonumber
-= minetest, pairs, string, tonumber
+local ipairs, minetest, string, tonumber
+    = ipairs, minetest, string, tonumber
 local string_format
-= string.format
+    = string.format
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
