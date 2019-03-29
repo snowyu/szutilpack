@@ -1,8 +1,8 @@
 -- LUALOCALS < ---------------------------------------------------------
-local ipairs, minetest, pairs, table, tonumber
-    = ipairs, minetest, pairs, table, tonumber
-local table_concat
-    = table.concat
+local ipairs, math, minetest, pairs, table, tonumber
+    = ipairs, math, minetest, pairs, table, tonumber
+local math_random, table_concat
+    = math.random, table.concat
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -70,11 +70,13 @@ local function dohuds(player)
 		huds[player:get_player_name()] = hud
 	end
 
+local now = minetest.get_us_time() / 1000000
 	for k in pairs(hud) do on[k] = on[k] or false end
 	for k, v in pairs(on) do
 		local h = hud[k]
 		if h or v then
 			v = v and scale or 0
+			local exp = now + math_random() * 2
 			if not h then
 				hud[k] = {
 					id = player:hud_add({
@@ -85,10 +87,12 @@ local function dohuds(player)
 							alignment = {x = -1, y = 1},
 							offset = {x = -2, y = -2},
 						}),
-					scale = v
+					scale = v,
+					exp = exp
 				}
-			elseif h.scale ~= v then
+			elseif h.scale ~= v or h.exp < now then
 				h.scale = v
+				h.exp = exp
 				player:hud_change(h.id, "scale", {x = v, y = v})
 			end
 		end
