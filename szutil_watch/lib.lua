@@ -68,6 +68,8 @@ local function watch_restore(dtime, wplayer, wname)
 			makes_footstep_sound = restore.makes_footstep_sound,
 			collisionbox = restore.collisionbox
 		})
+	wplayer:set_armor_groups(restore.armor)
+	wplayer:set_hp(restore.hp or 20)
 	setprivs(wname, function(x) x.interact = restore.interact end)
 	wplayer:set_pos(restore.pos)
 
@@ -127,7 +129,9 @@ local function watch_start(wparam, tparam)
 			inv = {
 				main = wplayer:get_inventory():get_list("main") or {},
 				craft = wplayer:get_inventory():get_list("craft") or {}
-			}
+			},
+			armor = wplayer:get_armor_groups(),
+			hp = wplayer:get_hp()
 		}
 		for n, l in pairs(data.saved.inv) do
 			for k, v in pairs(l) do
@@ -150,6 +154,7 @@ local function watch_start(wparam, tparam)
 			makes_footstep_sound = false,
 			collisionbox = {0}
 		})
+	wplayer:set_armor_groups({immortal = 1})
 	setprivs(wname, function(x) x.interact = nil end)
 
 	return true

@@ -1,6 +1,6 @@
 -- LUALOCALS < ---------------------------------------------------------
 local ipairs, minetest
-    = ipairs, minetest
+= ipairs, minetest
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -15,7 +15,12 @@ local function everyone(func)
 end
 
 minetest.register_globalstep(function(dt)
-		everyone(function(p) lib.restore(dt, p) end)
+		everyone(function(p)
+				lib.restore(dt, p)
+				if p:get_armor_groups().immortal then
+					p:set_breath(11)
+				end
+			end)
 	end)
 
 minetest.register_on_joinplayer(lib.stop)
