@@ -1,9 +1,10 @@
 -- LUALOCALS < ---------------------------------------------------------
 local minetest, pairs, rawset, type
-    = minetest, pairs, rawset, type
+= minetest, pairs, rawset, type
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
+local vzero = vector.new()
 
 local function playerize(param)
 	if (not param) or (param == "") then return end
@@ -39,12 +40,17 @@ local function watchdata_set(player, pname, data)
 	return player:set_attribute(modname, minetest.serialize(data))
 end
 
-local vzero = vector.new()
 local function watch_restore(dtime, wplayer, wname)
 	wname = wname or wplayer:get_player_name()
 
 	local data = watchdata_get(wplayer, wname)
-	if (not data) or (not data.restore) then return end
+	if not data then return end
+
+	if data.target then
+		return wplayer:set_breath(11)
+	end
+
+	if not data.restore then return end
 
 	local restore = data.restore
 	for k, v in pairs({
@@ -68,20 +74,29 @@ local function watch_restore(dtime, wplayer, wname)
 			makes_footstep_sound = restore.makes_footstep_sound,
 			collisionbox = restore.collisionbox
 		})
-	wplayer:set_armor_groups(restore.armor)
-	wplayer:set_hp(restore.hp or 20)
 	setprivs(wname, function(x) x.interact = restore.interact end)
-	wplayer:set_pos(restore.pos)
-
 	if restore.inv then
 		for k, v in pairs(restore.inv) do
 			wplayer:get_inventory():set_list(k, v)
 		end
 		data.restore.inv = nil
 	end
+	if vector.distance(wplayer:get_pos(), restore.pos) < 16 then
+		wplayer:set_hp(restore.hp or 20)
+	end
+	wplayer:set_pos(restore.pos)
 
 	if data.restore.ttl < 0 then data.restore = nil end
 	return watchdata_set(wplayer, wname, data)
+end
+
+local function watch_damage(wplayer, hp)
+	local wname = wplayer:get_player_name()
+
+	local data = watchdata_get(wplayer, wname)
+	if data and data.target then return 0 end
+
+	return hp
 end
 
 local function watch_stop(wparam, tparam)
@@ -99,6 +114,7 @@ local function watch_stop(wparam, tparam)
 	data.restore = data.saved or data.restore
 	if data.restore then data.restore.ttl = 0.5 end
 	data.saved = nil
+	data.target = nil
 	watchdata_set(wplayer, wname, data)
 
 	watch_restore(0, wplayer)
@@ -130,7 +146,6 @@ local function watch_start(wparam, tparam)
 				main = wplayer:get_inventory():get_list("main") or {},
 				craft = wplayer:get_inventory():get_list("craft") or {}
 			},
-			armor = wplayer:get_armor_groups(),
 			hp = wplayer:get_hp()
 		}
 		for n, l in pairs(data.saved.inv) do
@@ -147,20 +162,21 @@ local function watch_start(wparam, tparam)
 	data.target = tname
 	watchdata_set(wplayer, wname, data)
 
-	wplayer:set_attach(tplayer, "", vector.new(0, -5, -20), vector.new())
-	wplayer:set_eye_offset(vector.new(0, -5, -20), vector.new())
+	wplayer:set_attach(tplayer, "", vector.new(0, -5, -20), vzero)
+	wplayer:set_eye_offset(vector.new(0, -5, -20), vzero)
 	wplayer:set_properties({
 			visual_size = {x = 0, y = 0},
 			makes_footstep_sound = false,
 			collisionbox = {0}
 		})
-	wplayer:set_armor_groups({immortal = 1})
+	wplayer:set_hp(20)
 	setprivs(wname, function(x) x.interact = nil end)
 
 	return true
 end
 
 rawset(_G, modname, {
+		damage = watch_damage,
 		restore = watch_restore,
 		stop = watch_stop,
 		start = watch_start
