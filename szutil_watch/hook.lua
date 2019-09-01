@@ -1,6 +1,6 @@
 -- LUALOCALS < ---------------------------------------------------------
 local ipairs, minetest
-= ipairs, minetest
+    = ipairs, minetest
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -8,7 +8,7 @@ local lib = _G[modname]
 
 minetest.register_privilege("watch", "Player can watch other players")
 
-local function everyone(func) 		
+local function everyone(func)
 	for _, p in ipairs(minetest.get_connected_players()) do
 		func(p)
 	end

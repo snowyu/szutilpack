@@ -1,6 +1,6 @@
 -- LUALOCALS < ---------------------------------------------------------
-local ipairs, minetest, pairs, table, type
-    = ipairs, minetest, pairs, table, type
+local ipairs, minetest, pairs, rawset, table, type
+    = ipairs, minetest, pairs, rawset, table, type
 local table_concat
     = table.concat
 -- LUALOCALS > ---------------------------------------------------------
@@ -46,5 +46,5 @@ local function tracify(func)
 		return func(...)
 	end
 end
-print = tracify(print)
+rawset(_G, "print", tracify(print))
 minetest.log = tracify(minetest.log)

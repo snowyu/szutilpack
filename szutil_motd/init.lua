@@ -60,7 +60,7 @@ local function sendmotd(name, force)
 	-- it's available if they want.
 	if seen and not force then
 		minetest.chat_send_player(name,
-			"No MOTD changes since your last view.  Use /motd command to "
+			"No MOTD changes since your last view. Use /motd command to "
 			.. "review it any time.")
 		return
 	end
@@ -88,8 +88,8 @@ local function sendmotd(name, force)
 	-- Remind the player where they can get the MOTD if they
 	-- want it, and explain why it may or may not appear again
 	-- automatically on future logins.
-	minetest.chat_send_player(name, "Updated MOTD.  It will not display again "
-		.. "automatically, unless there are changes.  Use /motd command to "
+	minetest.chat_send_player(name, "Updated MOTD. It will not display again "
+		.. "automatically, unless there are changes. Use /motd command to "
 		.. "review it at any time.")
 end
 

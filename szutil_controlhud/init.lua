@@ -70,7 +70,7 @@ local function dohuds(player)
 		huds[player:get_player_name()] = hud
 	end
 
-local now = minetest.get_us_time() / 1000000
+	local now = minetest.get_us_time() / 1000000
 	for k in pairs(hud) do on[k] = on[k] or false end
 	for k, v in pairs(on) do
 		local h = hud[k]

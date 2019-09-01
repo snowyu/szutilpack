@@ -7,7 +7,7 @@ local math_floor, math_log, math_random
 
 local modname = minetest.get_current_modname()
 
--- Proportion of time to spend each cycle on recalculations.  For instance,
+-- Proportion of time to spend each cycle on recalculations. For instance,
 -- a value of 0.05 will mean that we attempt to use about 5% of each step
 -- cycle trying to do recalculates.
 local cycletime = tonumber(minetest.settings:get(modname .. "_cycletime")) or 0.02
@@ -34,7 +34,7 @@ local function exporand()
 end
 
 local mapgenqueue = {}
--- Run voxelmanip lighting calc on chunks post-mapgen.  It seems as though
+-- Run voxelmanip lighting calc on chunks post-mapgen. It seems as though
 -- the default mapgen lighting calc disagrees with this one (water does not
 -- absorb light; bug?)
 minetest.register_on_generated(function(minp, maxp)
@@ -91,7 +91,7 @@ end
 
 -- Run recalculates during each cycle.
 minetest.register_globalstep(function(dtime)
-		-- Don't attempt to do anything if nobody is connected.  There seems
+		-- Don't attempt to do anything if nobody is connected. There seems
 		-- to be some issue that may be crashing servers that run for a long
 		-- time with no players connected, which this may help avert.
 		local players = minetest.get_connected_players()
@@ -119,14 +119,14 @@ minetest.register_globalstep(function(dtime)
 		for k, v in pairs(processed) do
 			if v < now then del[k] = true end
 		end
-		for k, v in pairs(del) do
+		for k in pairs(del) do
 			processed[k] = nil
 		end
 
 		local nextcalc = now + calctime
 
 		-- Process generated chunks first.
-		for k, v in pairs(mapgenqueue) do
+		for _, v in pairs(mapgenqueue) do
 			procblock(v, nextcalc)
 			mapgenqueue = {}
 		end
@@ -137,7 +137,7 @@ minetest.register_globalstep(function(dtime)
 			while (minetest.get_us_time() / 1000000) < endtime do
 				-- Pick a random player, and then pick a random exponentially-
 				-- distributed random block around that player.
-				local pos = players[math_random(1, #players)]:getpos()
+				local pos = players[math_random(1, #players)]:get_pos()
 				pos.x = math_floor(pos.x / 16 + exporand() + 0.5)
 				pos.y = math_floor(pos.y / 16 + exporand() + 0.5)
 				pos.z = math_floor(pos.z / 16 + exporand() + 0.5)

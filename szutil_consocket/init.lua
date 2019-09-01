@@ -16,7 +16,7 @@ local modname = minetest.get_current_modname()
 local CONSOLE = "CONSOLE"
 
 -- Override privileges for the "console player", granting
--- them every privilege, including "cheats".  We assume that
+-- them every privilege, including "cheats". We assume that
 -- there are no "anti-privileges" registered that would
 -- actually limit access.
 do
@@ -24,7 +24,7 @@ do
 	function minetest.get_player_privs(who, ...)
 		if who == CONSOLE then
 			local p = {}
-			for k, v in pairs(minetest.registered_privileges) do
+			for k in pairs(minetest.registered_privileges) do
 				if k ~= "shout" then p[k] = true end
 			end
 			return p
@@ -131,7 +131,7 @@ local function concmd(client, line)
 
 	-- Try to run registered chat commands, and return a
 	-- failure if not found.
-	for k, v in ipairs(minetest.registered_on_chat_messages) do
+	for _, v in ipairs(minetest.registered_on_chat_messages) do
 		local ok, err = pcall(function() return v(CONSOLE, line) end)
 		if ok and err then return end
 		if not ok then
@@ -146,7 +146,7 @@ end
 local function receive(client)
 	local line, err = client.sock:receive("*l")
 	if line ~= nil then
-		-- Prepend the slash.  We assume that all input is to
+		-- Prepend the slash. We assume that all input is to
 		-- be commands rather than accidentally leaking chat.
 		while line:sub(1, 1) == "/" do
 			line = line:sub(2)
@@ -158,9 +158,9 @@ local function receive(client)
 		conmsg = function(x)
 			client.sock:send(x .. "\n")
 		end
-		local ok, err = pcall(function() concmd(client, line) end)
+		local ok, err2 = pcall(function() concmd(client, line) end)
 		conmsg = nil
-		if not ok then return error(err) end
+		if not ok then return error(err2) end
 		client.sock:send("> ")
 	elseif err ~= "timeout" then
 		clientlog(client, err)
@@ -172,5 +172,5 @@ end
 -- process commands from existing ones.
 minetest.register_globalstep(function()
 		accept()
-		for id, client in pairs(clients) do receive(client) end
+		for _, client in pairs(clients) do receive(client) end
 	end)

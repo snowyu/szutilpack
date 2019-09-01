@@ -5,8 +5,6 @@ local math_floor, math_random, os_date
     = math.floor, math.random, os.date
 -- LUALOCALS > ---------------------------------------------------------
 
-local modname = minetest.get_current_modname()
-
 local basespeed = tonumber(minetest.settings:get("time_speed_base")) or 72
 
 local dt, mt, rt, diff, ts

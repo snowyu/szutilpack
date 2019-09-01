@@ -17,7 +17,7 @@ local center = minetest.setting_get_pos(modname .. "_center") or {x = 0, y = 0, 
 local scale = minetest.setting_get_pos(modname .. "_scale")
 if (not scale) or (scale.x == 0) or (scale.y == 0) or (scale.z == 0) then return end
 
--- Size/aspect of "inner" elliptoid in which liquids are allowed.  The outer
+-- Size/aspect of "inner" elliptoid in which liquids are allowed. The outer
 -- shell of the world elliptoid will be a "margin" area in which liquids are
 -- converted to solid to keep them from flowing out.
 local margin = tonumber(minetest.settings:get(modname .. "_margin")) or 2
@@ -56,11 +56,11 @@ minetest.after(0, function()
 -- MAP GENERATION LOGIC
 
 -- Map generation hook that does actual terrain replacement.
-minetest.register_on_generated(function(minp, maxp)
+minetest.register_on_generated(function()
 		local vox, emin, emax = minetest.get_mapgen_object("voxelmanip")
 		local data = vox:get_data()
 		local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
-		local x, y, z, dx, dy, dz, ix, iy, iz, rs, irs, i
+		local dx, dy, dz, ix, iy, iz, rs, irs, i
 		for z = emin.z, emax.z do
 			dz = (z - center.z) / scale.z
 			dz = dz * dz
@@ -127,7 +127,7 @@ local function dofalldmg(dtime, player)
 	-- Player must be ouside of the world; falling inside
 	-- the world elliptoid will follow normal "only landing hurts"
 	-- rules.
-	local pos = player:getpos()
+	local pos = player:get_pos()
 	local x = (pos.x - center.x) / scale.x
 	local y = (pos.y - center.y) / scale.y
 	local z = (pos.z - center.z) / scale.z

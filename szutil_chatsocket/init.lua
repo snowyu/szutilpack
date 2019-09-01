@@ -20,7 +20,7 @@ do
 	local old_sendall = minetest.chat_send_all
 	function minetest.chat_send_all(text, ...)
 		local t = string_gsub(text, stripcolor, "")
-		for k, v in pairs(clients) do
+		for _, v in pairs(clients) do
 			if v.sent ~= t then
 				v.sock:send(t .. "\n")
 			else
@@ -35,7 +35,7 @@ end
 minetest.register_on_chat_message(function(name, text)
 		if text:sub(1,1) ~= "/" then
 			local t = string_gsub(text, stripcolor, "")
-			for k, v in pairs(clients) do
+			for _, v in pairs(clients) do
 				v.sock:send("<" .. name .. "> " .. t .. "\n")
 			end
 		end
@@ -77,11 +77,6 @@ local function accept()
 	end
 end
 
--- Receive chat messages.
-local function conchat(client, line)
-	minetest.chat_send_all(line);
-end
-
 -- Attempt to receive an input line from the console client, if
 -- one is ready (buffered non-blocking IO)
 local function receive(client)
@@ -100,5 +95,5 @@ end
 -- process commands from existing ones.
 minetest.register_globalstep(function()
 		accept()
-		for id, client in pairs(clients) do receive(client) end
+		for _, client in pairs(clients) do receive(client) end
 	end)

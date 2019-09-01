@@ -1,6 +1,6 @@
 -- LUALOCALS < ---------------------------------------------------------
 local minetest, pairs, rawset, type
-= minetest, pairs, rawset, type
+    = minetest, pairs, rawset, type
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -62,7 +62,7 @@ local function watch_restore(dtime, wplayer, wname)
 			collisionbox = {-0.3, -1, -0.3, 0.3, 1, 0.3},
 			interact = false,
 			pos = {x = 0, y = 0, z = 0}
-			}) do
+		}) do
 		restore[k] = restore[k] or v
 	end
 	restore.ttl = restore.ttl - dtime
@@ -106,7 +106,7 @@ local function watch_stop(wparam, tparam)
 	local data = watchdata_get(wplayer, wname)
 	if not data then return false, "not watching anybody" end
 
-	local tplayer, tname = playerize(tparam)
+	local _, tname = playerize(tparam)
 	if tname and tname ~= data.target then
 		return false, "not watching specified target"
 	end

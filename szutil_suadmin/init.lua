@@ -15,7 +15,7 @@ local modname = minetest.get_current_modname()
 -- future versions.
 local hashlen = minetest.get_password_hash("a", "b"):len()
 
--- Helper function to generate a new, random(-ish) salt value.  The quality
+-- Helper function to generate a new, random(-ish) salt value. The quality
 -- of the random source is questionable, but it's probably the best we have
 -- reliable access to here.
 local function gensalt()
@@ -29,7 +29,7 @@ local function gensalt()
 end
 
 -- Helper function to automatically upgrade non-secure un-hashed passwords
--- to hashed versions, using a new, random(-ish) salt.  The old, unencrypted
+-- to hashed versions, using a new, random(-ish) salt. The old, unencrypted
 -- password is replaced with a "~" string to indicate that it has already
 -- been converted to a hash (using ~ instead of empty string so we can set
 -- the password to empty-string to disable this feature).
@@ -58,9 +58,9 @@ upgradepass(function() minetest.settings:write() end)
 -- PROTECT PRIVILEGE-RELATED SETTINGS
 
 -- Try to wrap the built-in "set" chat command, so that:
---	- Changing the su password will trigger a re-hash.
---	- Users with "server" privs (who can use /set) but without "privs"
---	  privs cannot exploit certain known settings to gain "privs" access.
+-- - Changing the su password will trigger a re-hash.
+-- - Users with "server" privs (who can use /set) but without "privs"
+-- privs cannot exploit certain known settings to gain "privs" access.
 if minetest.chatcommands and minetest.chatcommands.set
 and minetest.chatcommands.set.func then
 	local prefix = modname .. "_"
@@ -123,8 +123,8 @@ end
 -- players trying to brute-force passwords.
 local retry = {}
 
--- Register /su command to escalate privs by password.  The argument is the
--- password, which must match the one configured.  If no password is configured,
+-- Register /su command to escalate privs by password. The argument is the
+-- password, which must match the one configured. If no password is configured,
 -- then the command will always return failure.
 minetest.register_chatcommand("su", {
 		description = "Escalate privileges by password.",

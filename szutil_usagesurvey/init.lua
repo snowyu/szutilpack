@@ -50,23 +50,23 @@ local function reghook(func, stat, pwhom, ppos)
 			local whom = t[pwhom]
 			local pn = getpn(whom)
 			if not pn then return end
-			local pos = ppos and t[ppos] or whom:getpos()
+			local pos = ppos and t[ppos] or whom:get_pos()
 			local id = blockid(pos)
 			return statadd(id, pn, stat, 1)
 		end)
 end
-reghook(minetest.register_on_dignode,	    "dig",   3, 1)
-reghook(minetest.register_on_placenode,	    "place", 3, 1)
-reghook(minetest.register_on_dieplayer,	    "die",   1)
+reghook(minetest.register_on_dignode, "dig", 3, 1)
+reghook(minetest.register_on_placenode, "place", 3, 1)
+reghook(minetest.register_on_dieplayer, "die", 1)
 reghook(minetest.register_on_respawnplayer, "spawn", 1)
-reghook(minetest.register_on_joinplayer,    "join",  1)
-reghook(minetest.register_on_leaveplayer,   "leave", 1)
-reghook(minetest.register_on_craft,	    "craft", 2)
+reghook(minetest.register_on_joinplayer, "join", 1)
+reghook(minetest.register_on_leaveplayer, "leave", 1)
+reghook(minetest.register_on_craft, "craft", 2)
 
 minetest.register_on_player_hpchange(function(whom, change)
 		local pn = getpn(whom)
 		if not pn then return end
-		local id = blockid(whom:getpos())
+		local id = blockid(whom:get_pos())
 		if change < 0 then
 			return statadd(id, pn, "hurt", -change)
 		else
@@ -84,7 +84,7 @@ local function procstep(dt, player)
 	if not pn then return end
 	local pd = getsub(playdb, pn)
 
-	local pos = player:getpos()
+	local pos = player:get_pos()
 	local dir = player:get_look_dir()
 	local cur = { pos.x, pos.y, pos.z, dir.x, dir.y, dir.z }
 	local moved
@@ -140,7 +140,7 @@ local function dbpath(id)
 	local p = minetest.get_worldpath() .. "/" .. modname
 	if id then
 		id = "" .. id
-		
+
 		if id:sub(1, 3) ~= "blk" then
 			id = "blk" .. id .. ".txt"
 		end
@@ -178,7 +178,7 @@ local function dbflush(forcerpt)
 	runtime = runtime + now - lasttime
 
 	if not forcerpt and ((runtime < 1 and alltime < 3600 and savedqty < 100)
-	or savedqty < 1) then return end
+		or savedqty < 1) then return end
 
 	local function ms(i) return math_floor(i *1000000) / 1000 end
 	minetest.log(modname .. ": recorded " .. savedqty .. " block(s) using "
@@ -200,7 +200,7 @@ minetest.register_on_shutdown(function()
 		for _, player in pairs(minetest.get_connected_players()) do
 			local pn = getpn(player)
 			if pn then
-				local id = blockid(player:getpos())
+				local id = blockid(player:get_pos())
 				statadd(id, pn, "shutdown", 1)
 			end
 		end
@@ -214,7 +214,7 @@ local function fmtrpt(t, id)
 	local p = { }
 	for k, v in pairs(t) do
 		local n = 0
-		for k2, v2 in pairs(v) do
+		for _, v2 in pairs(v) do
 			n = n + v2
 		end
 		p[#p + 1] = k
@@ -230,7 +230,7 @@ local function fmtrpt(t, id)
 		r[#r + 1] = "[" .. k .. "]"
 		local v = t[k]
 		local s = { }
-		for k2, v2 in pairs(v) do
+		for k2 in pairs(v) do
 			s[#s + 1] = k2
 		end
 		table_sort(s, function(a, b)
@@ -252,7 +252,7 @@ minetest.register_chatcommand("blockuse", {
 		func = function(name)
 			local player = minetest.get_player_by_name(name)
 			if not player then return end
-			local id = blockid(player:getpos())
+			local id = blockid(player:get_pos())
 
 			local t = deepadd(deepadd({ }, getsub(db, id)), dbload(id))
 			minetest.chat_send_player(name, fmtrpt(t, id))
@@ -264,10 +264,10 @@ minetest.register_chatcommand("worlduse", {
 		description = "Statistics about usage across the entire world.",
 		func = function(name)
 			local t = { }
-			for k, v in pairs(db) do
+			for _, v in pairs(db) do
 				t = deepadd(t, v)
 			end
-			for i, v in ipairs(minetest.get_dir_list(dbpath(), false)) do
+			for _, v in ipairs(minetest.get_dir_list(dbpath(), false)) do
 				t = deepadd(t, dbload(v))
 			end
 

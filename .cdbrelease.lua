@@ -13,5 +13,6 @@ stamp = ("00000000" .. stamp):sub(-8)
 return {
 	user = "Warr1024",
 	pkg = "szutilpack",
+	min = "5.0",
 	version = stamp .. "-$Format:%h$"
 }

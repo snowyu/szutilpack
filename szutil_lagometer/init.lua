@@ -7,7 +7,7 @@ local string_format
 
 local modname = minetest.get_current_modname()
 
--- How often to publish updates to players.  Too infrequent and the meter
+-- How often to publish updates to players. Too infrequent and the meter
 -- is no longer as "real-time", but too frequent and they'll get bombarded
 -- with HUD change packets.
 local interval = tonumber(minetest.settings:get(modname .. "_interval")) or 2
@@ -23,7 +23,7 @@ local lag = 0
 -- Keep track of connected players and their meters.
 local meters = {}
 
--- Create a separate privilege for players to see the lagometer.  This
+-- Create a separate privilege for players to see the lagometer. This
 -- feature is too "internal" to show to all players unconditionally,
 -- but not so "internal" that it should depend on the "server" priv.
 minetest.register_privilege("lagometer", "Can see the lagometer")
@@ -50,7 +50,7 @@ local function publish()
 	local t = string_format("Server Lag: %2.2f ", lag)
 	local q = lag * 10 + 0.5
 	if q > 40 then q = 40 end
-	for i = 1, q, 1 do t = t .. "|" end
+	for _ = 1, q, 1 do t = t .. "|" end
 
 	-- Apply the appropriate text to each meter.
 	for _, p in ipairs(minetest.get_connected_players()) do
@@ -58,7 +58,7 @@ local function publish()
 		local v = meters[n]
 
 		-- Players with privilege will see the meter, players without
-		-- will get an empty string.  The meters are always left in place
+		-- will get an empty string. The meters are always left in place
 		-- rather than added/removed for simplicity, and to make it easier
 		-- to handle when the priv is granted/revoked while the player
 		-- is connected.
@@ -85,7 +85,7 @@ local function publish()
 		elseif v and s == "" then
 			p:hud_remove(v.hud)
 			meters[n] = nil
-		elseif v and        v.text ~= s then
+		elseif v and v.text ~= s then
 			p:hud_change(v.hud, "text", s)
 			v.text = s
 		end
@@ -100,7 +100,7 @@ local function update()
 end
 update()
 
--- Do the lag estimate work in a globalstep.  If the lag spikes
+-- Do the lag estimate work in a globalstep. If the lag spikes
 -- up, publish immediately; if not, allow the timer to publish as
 -- it falls off.
 minetest.register_globalstep(function(dtime)
