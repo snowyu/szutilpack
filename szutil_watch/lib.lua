@@ -130,6 +130,7 @@ local function watch_start(wparam, tparam)
 	if wname == tname then return watch_stop(wparam) end
 
 	local data = watchdata_get(wplayer, wname) or {}
+	if data.target == tname then return end
 	data.saved = data.saved or data.restore
 	if not data.saved then
 		local props = wplayer:get_properties()
@@ -176,6 +177,8 @@ local function watch_start(wparam, tparam)
 end
 
 rawset(_G, modname, {
+		dataget = watchdata_get,
+		dataset = watchdata_set,
 		damage = watch_damage,
 		restore = watch_restore,
 		stop = watch_stop,
