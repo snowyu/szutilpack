@@ -1,0 +1,24 @@
+------------------------------------------------------------------------
+
+Allows admins to define a set of "roles" for easier player privilege
+management.
+
+The role command (re)defines a role as a set of privs:
+	/role <role> priv,priv,priv
+Each priv can be a primitive priv or a role name.  Role names
+will be expanded at the time they're applied, so redefining a role
+that other roles depend on may affect all dependant roles.
+
+There are a few special built-in roles:
+	all - all privileges
+	none - remove all existing privileges
+	default - the set of privileges assigned to new players
+The built-in roles cannot be redefined.
+
+/grant and /grantme can be used to grant roles the same as privs.
+First, all roles are expanded into their privs.  If the "none" role
+is included, then it's applied before any other privs.
+
+Revoking a role effectively revokes all privs it grants.
+
+------------------------------------------------------------------------
