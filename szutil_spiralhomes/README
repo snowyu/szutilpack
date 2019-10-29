@@ -1,0 +1,20 @@
+------------------------------------------------------------------------
+
+Set up each new player with a distinct home area, starting at (0, 0)
+and spiraling outward.  This placement should provide the maximum space
+between players to allow room for builds, but use map space efficiently.
+
+The actual spiral is an Archemedian spiral, and players are placed at
+Golden Angle rotations along it.
+
+If the "beds" mod (from MTG) is installed, then the player's initial
+respawn point is set.  If not, then the player will be teleported
+to home upon respawn.
+
+If the "sethome" mod (from MTG) is installed, then the player's
+initial home position is set.
+
+If the "areas" mod is installed, then the player will start out
+with a configurable area around the new home protected.
+
+------------------------------------------------------------------------

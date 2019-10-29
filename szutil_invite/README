@@ -1,0 +1,37 @@
+------------------------------------------------------------------------
+
+Allows players to invite other players to visit their homes.  Players
+CANNOT bring items with them when they teleport to visit, preventing
+players from using this as a cheap item transportation exploit.
+
+Players with the "szutil_invite" privilege can issue invitations.
+
+Each invitation has:
+- An invited player name.  Invitations are not transferrable.
+- A position, set to the position of the player creating it at the time
+  of creation.
+- An expiration time (in game time).
+
+Players receiving an invitation can use /visit to accept it and
+teleport.  They can use /depart to return to where they were before
+they accepted.  Each time they teleport this way, all inventory items
+will be dumped before leaving; players are advised to stow their gear
+first.
+
+The inviting player does NOT need to be present for invited players to
+visit, and invitees can visit or depart any number of times until the
+invitation expires.  Players visiting at the time the invitation expires
+will be sent back automatically.
+
+The /invite command invites a player to the current location for a
+specified amount of time.  Issuing another invitation to the same player
+updates the existing invitation (only one can be open at a time) and
+invitations can be revoked by setting the expiration time to zero.
+
+The /visit command accepts an invitation and teleports to another player
+to visit.
+
+The /depart command ends a visitation and returns to where the player
+was before accepting.
+
+------------------------------------------------------------------------
