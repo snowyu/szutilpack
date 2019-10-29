@@ -1,0 +1,10 @@
+------------------------------------------------------------------------
+
+This adds a HUD that shows player's input controls.  It's run by the
+server, so there may be some latency; it's most useful in local or
+single player games.
+
+Use "/controhud #" to set the size scale to #, where # is a number
+of value zero or greater.  A value of zero hides the HUD.
+
+------------------------------------------------------------------------

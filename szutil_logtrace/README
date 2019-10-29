@@ -1,0 +1,8 @@
+------------------------------------------------------------------------
+
+Allow users with special "logtrace" priv to watch traces of server logs,
+useful for admin or debugging purposes.
+
+Use the /logtrace command to toggle the feed.
+
+------------------------------------------------------------------------
