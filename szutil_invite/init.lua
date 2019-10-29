@@ -64,8 +64,12 @@ minetest.register_chatcommand("invite", {
 				invites[pname] = v
 			end
 			if expire <= 0 then
+				if not v[targname] then return true, "invitation does not exist" end
 				v[targname] = nil
-				return true, "invitation canceled"
+				return true, "invitation removed"
+			end
+			if not minetest.player_exists(targname) then
+				return false, "invited player does not exist"
 			end
 			v[targname] = {
 				exp = minetest.get_gametime() + expire,
@@ -83,6 +87,19 @@ minetest.register_chatcommand("invite", {
 		end
 	})
 
+local function tfmt(t)
+	t = math_floor(t)
+	if t < 60 then return t .. " sec" end
+	t = math_floor(t / 60)
+	if t < 60 then return t .. " min" end
+	t = math_floor(t / 60)
+	if t < 24 then return t .. " hr" end
+	t = math_floor(t / 24)
+	if t < 365 then return t .. " days" end
+	t = math_floor(t / 365)
+	if t < 100 then return t .. " years" end
+	return "basically forever"
+end
 minetest.register_chatcommand("invites", {
 		description = "List open invites",
 		func = function(pname)
@@ -92,11 +109,15 @@ minetest.register_chatcommand("invites", {
 				for k2, v2 in pairs(v1) do
 					if v2.exp > now then
 						if k1 == pname then
-							t[#t + 1] = string_format("- invited %q to %s, %ds left",
-								k2, minetest.pos_to_string(v2.pos), math_floor(v2.exp - now))
+							t[#t + 1] = string_format(
+								"- invited %q to %s, %s left",
+								k2, minetest.pos_to_string(v2.pos),
+								tfmt(v2.exp - now))
 						elseif k2 == pname then
-							t[#t + 1] = string_format("- received from %q to %s, %ds left",
-								k1, minetest.pos_to_string(v2.pos), math_floor(v2.exp - now))
+							t[#t + 1] = string_format(
+								"- received from %q to %s, %s left",
+								k1, minetest.pos_to_string(v2.pos),
+								tfmt(v2.exp - now))
 						end
 					end
 				end
