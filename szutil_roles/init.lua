@@ -75,7 +75,6 @@ local function expandroles(pname, privs, invert)
 				for p, def in pairs(minetest.registered_privileges) do
 					if not def.roleprivs then privs[p] = true end
 				end
-				minetest.chat_send_all(minetest.privs_to_string(privs))
 				return privs
 			end
 			local def = minetest.registered_privileges[k]
@@ -100,7 +99,6 @@ local function expandroles(pname, privs, invert)
 		union(privs, privexpand(minetest.settings:get("default_privs")))
 		privs.default = nil
 	end
-	minetest.chat_send_all(minetest.privs_to_string(privs))
 	return privs
 end
 
