@@ -10,12 +10,12 @@ local modname = minetest.get_current_modname()
 ------------------------------------------------------------------------
 -- IN-MEMORY DATABASE AND UTILITY
 
-local db = { }
+local db = {}
 
 local function getsub(tbl, id)
 	local x = tbl[id]
 	if x then return x end
-	x = { }
+	x = {}
 	tbl[id] = x
 	return x
 end
@@ -77,7 +77,7 @@ minetest.register_on_player_hpchange(function(whom, change)
 ------------------------------------------------------------------------
 -- PLAYER MOVEMENT/IDLE HOOKS
 
-local playdb = { }
+local playdb = {}
 local idlemin = 5
 local function procstep(dt, player)
 	local pn = getpn(player)
@@ -86,7 +86,7 @@ local function procstep(dt, player)
 
 	local pos = player:get_pos()
 	local dir = player:get_look_dir()
-	local cur = { pos.x, pos.y, pos.z, dir.x, dir.y, dir.z }
+	local cur = {pos.x, pos.y, pos.z, dir.x, dir.y, dir.z}
 	local moved
 	if pd.last then
 		for i = 1, 6 do
@@ -128,7 +128,7 @@ minetest.register_globalstep(function(dt)
 local function deepadd(t, u)
 	for k, v in pairs(u) do
 		if type(v) == "table" then
-			t[k] = deepadd(t[k] or { }, v)
+			t[k] = deepadd(t[k] or {}, v)
 		else
 			t[k] = (t[k] or 0) + v
 		end
@@ -151,7 +151,7 @@ end
 
 local function dbload(id)
 	local f = io_open(dbpath(id))
-	if not f then return { } end
+	if not f then return {} end
 	local u = minetest.deserialize(f:read("*all"))
 	f:close()
 	return u
@@ -172,7 +172,7 @@ local function dbflush(forcerpt)
 		minetest.safe_file_write(dbpath(id), minetest.serialize(t))
 		savedqty = savedqty + 1
 	end
-	db = { }
+	db = {}
 
 	now = minetest.get_us_time() / 1000000
 	runtime = runtime + now - lasttime
@@ -180,7 +180,7 @@ local function dbflush(forcerpt)
 	if not forcerpt and ((runtime < 1 and alltime < 3600 and savedqty < 100)
 		or savedqty < 1) then return end
 
-	local function ms(i) return math_floor(i *1000000) / 1000 end
+	local function ms(i) return math_floor(i * 1000000) / 1000 end
 	minetest.log(modname .. ": recorded " .. savedqty .. " block(s) using "
 		.. ms(runtime) .. "ms out of " .. ms(alltime) .. "ms ("
 		.. (math_floor(runtime / alltime * 10000) / 100)
@@ -211,7 +211,7 @@ minetest.register_on_shutdown(function()
 -- CHAT COMMAND
 
 local function fmtrpt(t, id)
-	local p = { }
+	local p = {}
 	for k, v in pairs(t) do
 		local n = 0
 		for _, v2 in pairs(v) do
@@ -225,11 +225,11 @@ local function fmtrpt(t, id)
 			return p[a] > p[b]
 		end)
 
-	local r = id and { "block", id } or { "world" }
+	local r = id and {"block", id} or {"world"}
 	for _, k in ipairs(p) do
 		r[#r + 1] = "[" .. k .. "]"
 		local v = t[k]
-		local s = { }
+		local s = {}
 		for k2 in pairs(v) do
 			s[#s + 1] = k2
 		end
@@ -254,7 +254,7 @@ minetest.register_chatcommand("blockuse", {
 			if not player then return end
 			local id = blockid(player:get_pos())
 
-			local t = deepadd(deepadd({ }, getsub(db, id)), dbload(id))
+			local t = deepadd(deepadd({}, getsub(db, id)), dbload(id))
 			minetest.chat_send_player(name, fmtrpt(t, id))
 		end
 	})
@@ -263,7 +263,7 @@ minetest.register_chatcommand("worlduse", {
 		privs = {server = true},
 		description = "Statistics about usage across the entire world.",
 		func = function(name)
-			local t = { }
+			local t = {}
 			for _, v in pairs(db) do
 				t = deepadd(t, v)
 			end

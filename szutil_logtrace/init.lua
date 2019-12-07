@@ -13,9 +13,9 @@ minetest.register_chatcommand("logtrace", {
 		func = function(name)
 			local player = minetest.get_player_by_name(name)
 			if not player then return end
-			local old = player:get_attribute("logtrace") or ""
+			local old = player:get_meta():get_string("logtrace") or ""
 			local v = (old == "") and "1" or ""
-			player:set_attribute("logtrace", v)
+			player:get_meta():set_string("logtrace", v)
 			minetest.chat_send_player(name, "Log Trace: "
 				.. (v ~= "" and "ON" or "OFF"))
 		end,
@@ -32,7 +32,7 @@ local function logtrace(...)
 	for _, p in pairs(minetest.get_connected_players()) do
 		local n = p:get_player_name()
 		if minetest.get_player_privs(n).logtrace then
-			local a = p:get_attribute("logtrace")
+			local a = p:get_meta():get_string("logtrace")
 			if a and a ~= "" then
 				minetest.chat_send_player(n, msg)
 			end

@@ -14,7 +14,7 @@ minetest.register_chatcommand("controlhud", {
 			if not player then return end
 			local num = tonumber(param)
 			if not num then return false, "invalid scale" end
-			player:set_attribute(modname, num)
+			player:get_meta():set_float(modname, num)
 		end,
 	})
 
@@ -39,7 +39,7 @@ local buttons = {"sneak", "jump", "LMB", "RMB"}
 local huds = {}
 
 local function dohuds(player)
-	local scale = tonumber(player:get_attribute(modname) or "") or 0
+	local scale = player:get_meta():get_float(modname) or 0
 
 	local on = {}
 	if scale > 0 then

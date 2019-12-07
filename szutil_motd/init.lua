@@ -98,4 +98,4 @@ end
 minetest.register_on_joinplayer(function(player) sendmotd(player:get_player_name()) end)
 
 -- Force popup display for players who request it via the /motd command.
-minetest.register_chatcommand("motd", { func = function(name) sendmotd(name, true) end})
+minetest.register_chatcommand("motd", {func = function(name) sendmotd(name, true) end})

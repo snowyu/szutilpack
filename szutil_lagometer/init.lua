@@ -34,9 +34,9 @@ minetest.register_chatcommand("lagometer", {
 		func = function(name)
 			local player = minetest.get_player_by_name(name)
 			if not player then return end
-			local old = player:get_attribute("lagometer") or ""
+			local old = player:get_meta():get_string("lagometer") or ""
 			local v = (old == "") and "1" or ""
-			player:set_attribute("lagometer", v)
+			player:get_meta():set_string("lagometer", v)
 			minetest.chat_send_player(name, "Lagometer: "
 				.. (v ~= "" and "ON" or "OFF"))
 		end,
@@ -64,7 +64,7 @@ local function publish()
 		-- is connected.
 		local s = ""
 		if minetest.get_player_privs(n).lagometer
-		and (p:get_attribute("lagometer") or "") ~= ""
+		and (p:get_meta():get_string("lagometer") or "") ~= ""
 		then s = t end
 
 		-- Only apply the text if it's changed, to minimize the risk of
@@ -74,12 +74,12 @@ local function publish()
 				text = s,
 				hud = p:hud_add({
 						hud_elem_type = "text",
-						position = { x = 0.5, y = 1 },
+						position = {x = 0.5, y = 1},
 						text = s,
-						alignment = { x = 1, y = -1 },
+						alignment = {x = 1, y = -1},
 						number = 0xC0C0C0,
-						scale = { x = 1280, y = 20 },
-						offset = { x = -262, y = -88 }
+						scale = {x = 1280, y = 20},
+						offset = {x = -262, y = -88}
 					})
 			}
 		elseif v and s == "" then

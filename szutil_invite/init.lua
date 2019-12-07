@@ -175,7 +175,7 @@ minetest.register_chatcommand("visit", {
 local function depart(player)
 	local meta = player:get_meta()
 	local pos = meta:get_string(modname .. "_pos")
-	if (not pos) or (pos == "") then return false, "not currently visiting" end
+	if (not pos) or (pos == "") then return false, " not currently visiting" end
 	pos = minetest.string_to_pos(pos)
 	dumpitems(player)
 	player:set_pos(pos)

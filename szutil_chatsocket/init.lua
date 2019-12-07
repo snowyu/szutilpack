@@ -33,7 +33,7 @@ end
 
 -- Intercept non-command chat messages and send them to all clients.
 minetest.register_on_chat_message(function(name, text)
-		if text:sub(1,1) ~= "/" then
+		if text:sub(1, 1) ~= "/" then
 			local t = string_gsub(text, stripcolor, "")
 			for _, v in pairs(clients) do
 				v.sock:send("<" .. name .. "> " .. t .. "\n")

@@ -28,7 +28,7 @@ local function watchdata_get(player, pname)
 	pname = pname or player:get_player_name()
 	local c = watchdata_cache[pname]
 	if c then return c end
-	c = player:get_attribute(modname)
+	c = player:get_meta():get_string(modname)
 	if (not c) or (c == "") then return end
 	c = minetest.deserialize(c)
 	watchdata_cache[pname] = c
@@ -37,7 +37,7 @@ end
 local function watchdata_set(player, pname, data)
 	pname = pname or player:get_player_name()
 	watchdata_cache[pname] = data
-	return player:set_attribute(modname, minetest.serialize(data))
+	return player:get_meta():set_string(modname, minetest.serialize(data))
 end
 
 local function watch_restore(dtime, wplayer, wname)

@@ -22,7 +22,7 @@ if (not scale) or (scale.x == 0) or (scale.y == 0) or (scale.z == 0) then return
 -- converted to solid to keep them from flowing out.
 local margin = tonumber(minetest.settings:get(modname .. "_margin")) or 2
 if scale.x <= margin or scale.y <= margin or scale.z <= margin then return end
-local iscale = { x = scale.x - margin, y = scale.y - margin, z = scale.z - margin }
+local iscale = {x = scale.x - margin, y = scale.y - margin, z = scale.z - margin}
 
 minetest.log(modname .. ": scale " .. minetest.pos_to_string(scale) .. " center "
 	.. minetest.pos_to_string(center) .. " margin " .. margin)
