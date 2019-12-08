@@ -76,6 +76,7 @@ minetest.register_on_joinplayer(lib.stop)
 minetest.register_on_leaveplayer(function(player)
 		lib.stop(player)
 		everyone(function(p) lib.stop(p, player) end)
+		huds[player:get_player_name()] = nil
 	end)
 
 minetest.register_chatcommand("watch", {
