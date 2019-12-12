@@ -163,8 +163,8 @@ local function watch_start(wparam, tparam)
 	data.target = tname
 	watchdata_set(wplayer, wname, data)
 
-	wplayer:set_attach(tplayer, "", vector.new(0, -5, -20), vzero)
-	wplayer:set_eye_offset(vector.new(0, -5, -20), vzero)
+	wplayer:set_attach(tplayer, "", vector.new(0, 5, 0), vzero)
+	wplayer:set_eye_offset(vector.new(0, 5, 0), vzero)
 	wplayer:set_properties({
 			visual_size = {x = 0, y = 0},
 			makes_footstep_sound = false,
