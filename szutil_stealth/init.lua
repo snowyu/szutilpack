@@ -58,13 +58,20 @@ minetest.register_privilege("stealth", {
 
 minetest.register_on_joinplayer(updatevisible)
 
-local oldsend = minetest.chat_send_all
-minetest.chat_send_all = function(msg, ...)
-	local pname = string_match(msg, "^%*%*%* (%S+) joined the game.$")
-	or string_match(msg, "^%*%*%* (%S+) left the game.$")
-	if pname and isstealth(pname) then return end
-	return oldsend(msg, ...)
+local hooked
+local function chathook()
+	if minetest.chat_send_all == hooked then return end
+	local oldsend = minetest.chat_send_all
+	hooked = function(msg, ...)
+		local pname = string_match(msg, "^%*%*%* (%S+) joined the game.$")
+		or string_match(msg, "^%*%*%* (%S+) left the game.$")
+		if pname and isstealth(pname) then return end
+		return oldsend(msg, ...)
+	end
+	minetest.chat_send_all = hooked
+	minetest.after(0, chathook)
 end
+chathook()
 
 local function stripstatus(msg, ...)
 	local pref, clients = string_match(msg, "^(.*)clients={(.*)}$")
