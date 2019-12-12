@@ -1,0 +1,17 @@
+------------------------------------------------------------------------
+
+This mod tries to make a player completely invisible, including in-game
+model, nametag, muting join/leave messages, and not displaying the name
+in the status line.  This can be used for administering a server or
+spectating the action without accidentally affecting player behavior or
+disrupting the normal flow of things.
+
+Currently the "stealth" attribute is managed by a priv.  Granting the
+priv does not change the player state in realtime; a re-login may be
+necessary.
+
+Players cannot currently toggle stealth voluntarily.  Note that toggling
+the priv while the affected player is logged in may cause login/logout
+messages to mismatch, revealing the use of stealth.
+
+------------------------------------------------------------------------

@@ -12,8 +12,9 @@ A pack of independent utilities, including:
 - `szutil_motd`: Display a formspec MOTD to players on login, only if updated since the last view.
 - `szutil_roles`: Manage privs via special privs that represent groups of other privs.
 - `szutil_spiralhomes`: New players are assigned initial spawn locations dispersed around the world in an outward spiral.
+- `szutil_stealth`: Make a player as close to completely invisble to players as possible, for moderation or spectation use.
 - `szutil_suadmin`: Change admin access to be based on a /su (password) command, instead of by player name.
 - `szutil_usagesurvey`: Collect usage statistics per-mapblock on how each is being used (e.g. for pruning lightly-used portions of the map).
-- `szutil_watch`: Allow privileged players to spectate other players.
+- `szutil_watch`: Allow privileged players to attach to and spectate other players.
 
 Each mod in the pack is effectively independent, and they can be enabled/disabled individually.  Mods are distributed as a single pack because they have a single shared maintenance/release cycle.
