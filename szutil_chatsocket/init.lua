@@ -34,7 +34,7 @@ end
 -- Intercept non-command chat messages and send them to all clients.
 minetest.register_on_chat_message(function(name, text)
 		if text:sub(1, 1) ~= "/"
-		and minetest.check_player_priv(name, "shout") then
+		and minetest.check_player_privs(name, "shout") then
 			local t = string_gsub(text, stripcolor, "")
 			for _, v in pairs(clients) do
 				v.sock:send("<" .. name .. "> " .. t .. "\n")
