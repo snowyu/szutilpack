@@ -25,8 +25,11 @@ local function updatevisible(player)
 	local isvis = nonzero(props.visual_size)
 	or props.pointable
 	or atts.color.a > 0
+	or props.makes_footstep_sound
 
-	if isvis then saved[pname] = {p = props, a = atts} end
+	if isvis and not saved[pname] then
+		saved[pname] = {p = props, a = atts}
+	end
 	local needvis = not isstealth(player)
 	if isvis == needvis then return end
 
