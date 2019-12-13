@@ -18,6 +18,9 @@ areasize = vector.floor(vector.multiply({
 			z = math_abs(areasize.z)
 		}, 0.5))
 local skipids = tonumber(minetest.settings:get(modname .. "_skip_ids"))
+local maxdist = tonumber(minetest.settings:get(modname .. "_max_distance"))
+or tonumber(minetest.settings:get("mapgen_limit"))
+or 32768 * 7/8
 
 local modstore = minetest.get_mod_storage()
 local lastid = modstore:get_int("lastid") or 0
@@ -39,11 +42,17 @@ local function playerid(player)
 	return id
 end
 
+local function distreflect(r)
+	if r > maxdist then return distreflect(maxdist * 2 - r) end
+	if r < 0 then return distreflect(-r) end
+	return r
+end
+
 local function findhome(player, pos)
 	if not pos then
 		local id = playerid(player)
 		local theta = id * goldangle
-		local r = (id - 1) * scale
+		local r = distreflect((id - 1) * scale)
 		pos = vector.round({
 				x = r * math_cos(theta),
 				y = 0,
