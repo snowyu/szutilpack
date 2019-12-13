@@ -61,6 +61,17 @@ minetest.register_privilege("stealth", {
 
 minetest.register_on_joinplayer(updatevisible)
 
+local timer = 0
+minetest.register_globalstep(function(dtime)
+		timer = timer - dtime
+		if timer <= 0 then
+			for _, player in pairs(minetest.get_connected_players()) do
+				if isstealth(player) then updatevisible(player) end
+			end
+			timer = 1
+		end
+	end)
+
 local hooked
 local function chathook()
 	if minetest.chat_send_all == hooked then return end
