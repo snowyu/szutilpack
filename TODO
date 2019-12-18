@@ -14,4 +14,9 @@
 - Make szuti_invite notify inviter when invitee visits/departs, add
   sound/particles to teleport?
 
+- Mod for handling offline coordinate storage?
+	- Store last coords for offline players in modstore.
+	- Amend /teleport command to teleport to offline player pos.
+	- Add option to show HUDs for distant players w/ priv.
+
 ------------------------------------------------------------------------
