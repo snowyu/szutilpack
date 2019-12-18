@@ -1,0 +1,17 @@
+------------------------------------------------------------------------
+
+- ServerError: AsyncErr: ServerThread::run Lua: Runtime error from mod
+  '' in callback on_chat_message(): /config2/.minetest/mods/szutilpack/
+  szutil_suadmin/init.lua:89: attempt to index field 'settings' (a
+  userdata value)
+
+- szutil_watch needs to save player inventory, watch for race
+  conditions.
+
+- Make szutil_invite accept multiple invitee names, w/ commas, maybe
+  even globs/wildcards?
+
+- Make szuti_invite notify inviter when invitee visits/departs, add
+  sound/particles to teleport?
+
+------------------------------------------------------------------------
