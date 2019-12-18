@@ -77,8 +77,8 @@ local function chathook()
 	if minetest.chat_send_all == hooked then return end
 	local oldsend = minetest.chat_send_all
 	hooked = function(msg, ...)
-		local pname = string_match(msg, "^%*%*%* (%S+) joined the game.$")
-		or string_match(msg, "^%*%*%* (%S+) left the game.$")
+		local pname = string_match(msg, "^%*%*%* (%S+) joined the game")
+		or string_match(msg, "^%*%*%* (%S+) left the game")
 		if pname and isstealth(pname) then return end
 		return oldsend(msg, ...)
 	end
