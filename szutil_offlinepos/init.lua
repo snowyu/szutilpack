@@ -1,6 +1,6 @@
 -- LUALOCALS < ---------------------------------------------------------
-local minetest, pairs, string, table
-    = minetest, pairs, string, table
+local minetest, pairs, pcall, string, table
+    = minetest, pairs, pcall, string, table
 local string_gmatch, string_match, table_concat
     = string.gmatch, string.match, table.concat
 -- LUALOCALS > ---------------------------------------------------------
@@ -20,7 +20,10 @@ local function matchplayers(spec)
 	for k, v in pairs(fields) do
 		local matched
 		for p in string_gmatch(spec, "[^%s]+") do
-			matched = matched or string_match(k, p)
+			if not matched then
+				local ok, res = pcall(function() return string_match(k, p) end)
+				matched = matched or (ok and res)
+			end
 		end
 		if matched then
 			local player = minetest.get_player_by_name(k)
@@ -76,6 +79,10 @@ minetest.register_chatcommand("postrack", {
 
 local huds = {}
 
+minetest.register_on_leaveplayer(function(player)
+		huds[player:get_player_name()] = nil
+	end)
+
 minetest.register_globalstep(function()
 		for _, player in pairs(minetest.get_connected_players()) do
 			local pname = player:get_player_name()
@@ -130,7 +137,7 @@ minetest.register_globalstep(function()
 						id = player:hud_add({
 								hud_elem_type = "waypoint",
 								world_pos = v,
-								name = v.on and k or ("(" .. k .. ")"),
+								name = v.on and k or ("[" .. k .. "]"),
 								number = 0xffff00
 							})
 					}
