@@ -145,3 +145,29 @@ minetest.register_globalstep(function()
 			end
 		end
 	end)
+
+local teleport = minetest.registered_chatcommands.teleport
+if teleport and teleport.func then
+	local oldfunc = teleport.func
+	teleport.func = function(...)
+		local oldget = minetest.get_player_by_name
+		local function helper(...)
+			minetest.get_player_by_name = oldget
+			return ...
+		end
+		function minetest.get_player_by_name(name, ...)
+			local player = oldget(name, ...)
+			if player then return player end
+			local s = modstore:get_string(name)
+			if s and s ~= "" then
+				return {
+					get_pos = function()
+						return minetest.string_to_pos(s)
+					end,
+					set_pos = function() end
+				}
+			end
+		end
+		return helper(oldfunc(...))
+	end
+end

@@ -7,6 +7,6 @@ Add support for some commands utilizing player positions.
 
 - Add /pos to get player's current position.
 
-- Add /postrack to enable/disable player position waypoints.
+- Add /postrack to enable/disable player position waypoint HUDs.
 
 ------------------------------------------------------------------------
