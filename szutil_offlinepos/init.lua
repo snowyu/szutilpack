@@ -53,27 +53,48 @@ minetest.register_chatcommand("pos", {
 	})
 
 local trackcache = {}
+local function gettracking(player, pname)
+	local tracking = {}
+	if minetest.check_player_privs(pname, modname) then
+		tracking = trackcache[pname]
+		if not tracking then
+			local s = player:get_meta():get_string(modname)
+			tracking = s and s ~= "" and minetest.deserialize(s) or {}
+		end
+	end
+	return tracking
+end
+
+local function trackset(pname, param, value)
+	local player = minetest.get_player_by_name(pname)
+	if not player then return false, "Cannot track while offline" end
+
+	local set = matchplayers(param)
+	local tracking = gettracking(player, pname)
+	for k in pairs(set) do
+		if k ~= pname then tracking[k] = value end
+	end
+
+	trackcache[pname] = tracking
+	player:get_meta():set_string(modname, minetest.serialize(tracking))
+
+	local total = 0
+	for _ in pairs(tracking) do total = total + 1 end
+	return true, "now tracking " .. total .. " player(s)"
+end
+
 minetest.register_chatcommand("postrack", {
-		description = "Track current position of players",
+		description = "Enable tracking position of players",
 		privs = {[modname] = true},
 		func = function(pname, param)
-			local player = minetest.get_player_by_name(pname)
-			if not player then return false, "Cannot track while offline" end
-
-			local tracking = matchplayers(param)
-			local total = 0
-			for k in pairs(tracking) do
-				if k ~= pname then
-					tracking[k] = true
-					total = total + 1
-				else
-					tracking[k] = nil
-				end
-			end
-
-			trackcache[pname] = tracking
-			player:get_meta():set_string(modname, minetest.serialize(tracking))
-			return true, "now tracking " .. total .. " player(s)"
+			return trackset(pname, param, true)
+		end
+	})
+minetest.register_chatcommand("posuntrack", {
+		description = "Disable tracking position of players",
+		privs = {[modname] = true},
+		func = function(pname, param)
+			return trackset(pname, param)
 		end
 	})
 
@@ -90,11 +111,7 @@ minetest.register_globalstep(function()
 
 			local tracking = {}
 			if minetest.check_player_privs(pname, modname) then
-				tracking = trackcache[pname]
-				if not tracking then
-					local s = player:get_meta():get_string(modname)
-					tracking = s and s ~= "" and minetest.deserialize(s) or {}
-				end
+				tracking = gettracking(player, pname)
 			end
 
 			local phuds = huds[pname]
