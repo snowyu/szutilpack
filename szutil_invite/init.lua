@@ -168,6 +168,7 @@ minetest.register_chatcommand("visit", {
 
 			dumpitems(player)
 			player:set_pos(inv.pos)
+			minetest.chat_send_player(param, pname .. " is now visiting you")
 			return true, string_format("now visiting %q, use \"/depart\" to return", param)
 		end
 	})
@@ -179,6 +180,8 @@ local function depart(player)
 	pos = minetest.string_to_pos(pos)
 	dumpitems(player)
 	player:set_pos(pos)
+	minetest.chat_send_player(meta:get_string(modname .. "_name"),
+		player:get_player_name() .. " visit ended")
 	meta:set_string(modname .. "_pos", "")
 	meta:set_string(modname .. "_name", "")
 	return true
