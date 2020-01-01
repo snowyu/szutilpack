@@ -19,7 +19,7 @@ local function savedb()
 			local any = false
 			for k2, v2 in pairs(v1) do
 				if (not v2.exp) or (v2.exp < now) then
-					invites[k2] = nil
+					v1[k2] = nil
 				else
 					any = true
 				end
