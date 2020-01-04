@@ -1,9 +1,9 @@
 -- LUALOCALS < ---------------------------------------------------------
-local math, minetest, pairs, string, table, tonumber
-    = math, minetest, pairs, string, table, tonumber
-local math_floor, math_random, string_format, string_match,
+local math, minetest, os, pairs, string, table, tonumber
+    = math, minetest, os, pairs, string, table, tonumber
+local math_floor, math_random, os_time, string_format, string_match,
       table_concat
-    = math.floor, math.random, string.format, string.match,
+    = math.floor, math.random, os.time, string.format, string.match,
       table.concat
 -- LUALOCALS > ---------------------------------------------------------
 
@@ -13,20 +13,27 @@ local modstore = minetest.get_mod_storage()
 local invites = modstore:get_string("invites")
 invites = invites and minetest.deserialize(invites) or {}
 local function savedb()
-	local now = minetest.get_gametime()
-	if now then
-		for k1, v1 in pairs(invites) do
-			local any = false
-			for k2, v2 in pairs(v1) do
-				if (not v2.exp) or (v2.exp < now) then
-					v1[k2] = nil
-				else
-					any = true
-				end
+	local now = os_time()
+	local newdb = {}
+	for fromname, tolist in pairs(invites) do
+		local newlist
+		for toname, data in pairs(tolist) do
+			if (not data.exp) or (data.exp < now) then
+				minetest.log("invite expired: " .. minetest.serialize({
+							from = fromname,
+							to = toname,
+							data = data,
+							now = now
+						}))
+				tolist[toname] = nil
+			else
+				newlist = newlist or {}
+				newlist[toname] = data
 			end
-			if not any then invites[k1] = nil end
 		end
+		newdb[fromname] = newlist
 	end
+	invites = newdb
 	return modstore:set_string("invites", minetest.serialize(invites))
 end
 local function dbvac()
@@ -51,7 +58,8 @@ minetest.register_chatcommand("invite", {
 			if vname and vname ~= "" then return false, "cannot invite while visiting" end
 
 			local targname, expire = string_match(param, "([^ ]+) (.+)")
-			expire = tonumber(expire or 60)
+			expire = tonumber(expire or 86400)
+			targname = targname or param
 			if (not targname) or (not expire) then return false, "invalid parameters" end
 			if targname == pname then return false, "cannot invite yourself" end
 			local sender = minetest.get_player_by_name(pname)
@@ -72,7 +80,7 @@ minetest.register_chatcommand("invite", {
 				return false, "invited player does not exist"
 			end
 			v[targname] = {
-				exp = minetest.get_gametime() + expire,
+				exp = os_time() + expire,
 				pos = pos
 			}
 			savedb()
@@ -103,7 +111,7 @@ end
 minetest.register_chatcommand("invites", {
 		description = "List open invites",
 		func = function(pname)
-			local now = minetest.get_gametime()
+			local now = os_time()
 			local t = {}
 			for k1, v1 in pairs(invites) do
 				for k2, v2 in pairs(v1) do
@@ -153,7 +161,7 @@ minetest.register_chatcommand("visit", {
 			local inv = invites[param]
 			if not inv then return false, "invitation not found or expired" end
 			inv = inv[pname]
-			if (not inv) or (inv.exp <= minetest.get_gametime()) then
+			if (not inv) or (inv.exp <= os_time()) then
 				return false, "invitation not found or expired"
 			end
 
@@ -211,7 +219,7 @@ local function expireplayer(player, now)
 end
 local function expirecheck()
 	minetest.after(1, expirecheck)
-	local now = minetest.get_gametime()
+	local now = os_time()
 	if not now then return end
 	for _, player in pairs(minetest.get_connected_players()) do
 		expireplayer(player, now)
