@@ -1,14 +1,21 @@
 -- LUALOCALS < ---------------------------------------------------------
 local math, minetest, os, pairs, string, table, tonumber
     = math, minetest, os, pairs, string, table, tonumber
-local math_floor, math_random, os_time, string_format, string_match,
-      table_concat
-    = math.floor, math.random, os.time, string.format, string.match,
-      table.concat
+local math_floor, math_pow, math_random, os_time, string_format,
+      string_match, table_concat
+    = math.floor, math.pow, math.random, os.time, string.format,
+      string.match, table.concat
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
 local modstore = minetest.get_mod_storage()
+
+local maxint = math_pow(2, 52)
+local function clamp(n)
+	if n > maxint then return maxint end
+	if n < -maxint then return -maxint end
+	return n
+end
 
 local invites = modstore:get_string("invites")
 invites = invites and minetest.deserialize(invites) or {}
@@ -80,7 +87,7 @@ minetest.register_chatcommand("invite", {
 				return false, "invited player does not exist"
 			end
 			v[targname] = {
-				exp = os_time() + expire,
+				exp = clamp(os_time() + expire),
 				pos = pos
 			}
 			savedb()
