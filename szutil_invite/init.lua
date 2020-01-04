@@ -10,6 +10,13 @@ local math_floor, math_random, os_time, string_format, string_match,
 local modname = minetest.get_current_modname()
 local modstore = minetest.get_mod_storage()
 
+local maxint = math_pow(2, 52)
+local function clamp(n)
+	if n > maxint then return maxint end
+	if n < -maxint then return -maxint end
+	return n
+end
+
 local invites = modstore:get_string("invites")
 invites = invites and minetest.deserialize(invites) or {}
 local function savedb()
@@ -80,7 +87,7 @@ minetest.register_chatcommand("invite", {
 				return false, "invited player does not exist"
 			end
 			v[targname] = {
-				exp = os_time() + expire,
+				exp = clamp(os_time() + expire),
 				pos = pos
 			}
 			savedb()
