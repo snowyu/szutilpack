@@ -88,7 +88,7 @@ end
 chathook()
 
 local function stripstatus(msg, ...)
-	local pref, clients = string_match(msg, "^(.*)clients={(.*)}$")
+	local pref, clients, suff = string_match(msg, "^(.*)clients={(.*)}(.*)$")
 	if not clients then return msg, ... end
 	local clist = {}
 	for pname in string_gmatch(clients, "%S+") do
@@ -99,7 +99,7 @@ local function stripstatus(msg, ...)
 			clist[#clist + 1] = pname
 		end
 	end
-	msg = pref .. "clients={" .. table_concat(clist, ", ") .. "}"
+	msg = pref .. "clients={" .. table_concat(clist, ", ") .. "}" .. suff
 	return msg, ...
 end
 local oldstatus = minetest.get_server_status
