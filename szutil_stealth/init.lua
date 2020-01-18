@@ -89,6 +89,7 @@ chathook()
 
 local function stripstatus(msg, ...)
 	local pref, clients = string_match(msg, "^(.*)clients={(.*)}$")
+	if not clients then return msg, ... end
 	local clist = {}
 	for pname in string_gmatch(clients, "%S+") do
 		if string_sub(pname, -1) == "," then
