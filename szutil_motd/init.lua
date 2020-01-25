@@ -6,54 +6,25 @@ local io_close, io_open
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
-
--- Generic function to read an entire text file, used to load
--- the "seen" database, and to read the motd.
-local function readfile(path, trans)
-	local f = io_open(path, "rb")
-	if f then
-		local d = f:read("*all")
-		io_close(f)
-		if trans then return trans(d) end
-		return d
-	end
-end
+local modstore = minetest.get_mod_storage()
 
 -- Path to the extended motd file, stored in the world path.
 local motdpath = minetest.get_worldpath() .. "/" .. modname .. ".txt"
-
--- Maintain a database on disk of all players who have seen an MOTD, and
--- which specific version each has seen, so we only need to pop up a
--- nag screen if there's new content.
-local seenpath = minetest.get_worldpath() .. "/" .. modname .. "_seen"
-local seendb = {}
-readfile(seenpath, function(d) seendb = minetest.deserialize(d) end)
-
--- Calculate form dimensions (configurable) and spec strings.
-local fspref, fssuff
-do
-	local fsw = tonumber(minetest.settings:get(modname .. "_width")) or 8.5
-	local fsh = tonumber(minetest.settings:get(modname .. "_height")) or 6
-	local tbw = fsw - 0.25
-	local tbh = fsh - 0.75
-	fspref = "size[" .. fsw .. "," .. fsh .. ",true]"
-	.. "textlist[0,0;" .. tbw .. "," .. tbh .. ";motd;"
-	fssuff = ";0;true]button_exit[0," .. tbh .. ";" .. fsw
-	.. ",1;ok;Continue]"
-end
 
 -- Function to send the actual MOTD content to the player, in either
 -- automatic mode (on login) or "forced" mode (on player request).
 local function sendmotd(name, force)
 	-- Load the MOTD fresh on each request, so changes can be
 	-- made while the server is running, and take effect immediately.
-	local motd = readfile(motdpath)
-	if not motd then return end
+	local f = io_open(motdpath, "rb")
+	if not f then return end
+	local motd = f:read("*all")
+	io_close(f)
 
 	-- Compute a hash of the MOTD content, and figure out
 	-- if a player has already seen this version.
-	local hash = minetest.get_password_hash("", motd)
-	local seen = seendb[name] and seendb[name] == hash
+	local hash = minetest.sha1(motd)
+	local seen = (modstore:get_string(name) or "") == hash
 
 	-- If player has seen this version and did not specifically
 	-- request redisplay, just send a chat message reminding them that
@@ -66,9 +37,15 @@ local function sendmotd(name, force)
 	end
 
 	-- Send MOTD as a nicely-formatted formspec popup.
-	minetest.show_formspec(name, modname, fspref
-		.. minetest.formspec_escape(motd):gsub("\n", ",")
-		.. fssuff)
+	local fsw = tonumber(minetest.settings:get(modname .. "_width")) or 8.5
+	local fsh = tonumber(minetest.settings:get(modname .. "_height")) or 6
+	minetest.show_formspec(name, modname,
+		"size[" .. fsw .. "," .. fsh .. ",true]"
+		.. "textarea[0.3,0;" .. fsw .. "," .. fsh .. ";;;"
+		.. minetest.formspec_escape(motd)
+		.. "]button_exit[0," .. (fsh - 0.75) .. ";" .. fsw
+		.. ",1;ok;" .. (minetest.settings:get(modname
+				.. "_button") or "Continue") .. "]")
 
 	-- If the player had already seen the MOTD (i.e. this is a
 	-- forced request) then we don't need to update the database or
@@ -78,12 +55,7 @@ local function sendmotd(name, force)
 	-- Update the seen database in-memory and on-disk
 	-- so we don't send another copy of the same content to the
 	-- same player automatically.
-	seendb[name] = hash
-	local f = io_open(seenpath, "wb")
-	if f then
-		f:write(minetest.serialize(seendb))
-		io_close(f)
-	end
+	modstore:set_string(name, hash)
 
 	-- Remind the player where they can get the MOTD if they
 	-- want it, and explain why it may or may not appear again
