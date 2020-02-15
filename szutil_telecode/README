@@ -1,0 +1,26 @@
+------------------------------------------------------------------------
+
+This mod adds the "/tc" command, which allows teleportation by code.
+
+- "/tc" gets the telecode for the current location.
+- "/tc <code>" teleports to the specified location.
+
+Teleportation codes, i.e. "telecodes", are 16-digit hex numbers which
+contain an encrypted position (rounded to center of node) and an
+authentication checksum.  They are effectively opaque to players, and
+cannot be guessed, decoded, modified, or compared (other than exact
+equality) without knowing the server's private encryption key.  Keys
+are per-server/per-world, so telecodes from one world, or from single
+player, cannot be used on a different server.
+
+Players must be able to physically travel to a location to find the
+telecode for it, but may then later freely travel to that location at
+any time, and/or share the code with anyone they want via any means
+at their disposal, such as in-game chat, posting on wikis/forums, etc.
+
+This mod is compatible with NodeCore, both in that it ignores special
+"virtual" items like injury/burn, and that it disallows carrying your
+items with you when you teleport (inventory must be completely empty)
+to avoid breaking gameplay.
+
+------------------------------------------------------------------------
