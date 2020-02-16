@@ -14,6 +14,7 @@ A pack of independent utilities, including:
 - `szutil_spiralhomes`: New players are assigned initial spawn locations dispersed around the world in an outward spiral.
 - `szutil_stealth`: Make a player as close to completely invisble to players as possible, for moderation or spectation use.
 - `szutil_suadmin`: Change admin access to be based on a /su (password) command, instead of by player name.
+- `szutil_telecode`: Teleportation by opaque codes that can be shared, saved, and published.
 - `szutil_usagesurvey`: Collect usage statistics per-mapblock on how each is being used (e.g. for pruning lightly-used portions of the map).
 - `szutil_watch`: Allow privileged players to attach to and spectate other players.
 
