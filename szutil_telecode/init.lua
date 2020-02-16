@@ -1,8 +1,8 @@
 -- LUALOCALS < ---------------------------------------------------------
-local error, minetest, pairs, string, table, tonumber
-    = error, minetest, pairs, string, table, tonumber
-local string_format, table_concat
-    = string.format, table.concat
+local error, ipairs, minetest, pairs, string, table, tonumber, type
+    = error, ipairs, minetest, pairs, string, table, tonumber, type
+local string_format, table_concat, table_remove, table_sort
+    = string.format, table.concat, table.remove, table.sort
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -34,6 +34,7 @@ local function tcencode(pos)
 end
 
 local function tcdecode(str)
+	if not str or type(str) ~= "string" then return end
 	str = str:gsub("-", "")
 	if not str:match("^[0-9a-f]*$") then return end
 	if #str ~= 16 then return end
@@ -56,6 +57,43 @@ local function tcdecode(str)
 
 	hash = tonumber(hash, 16)
 	return minetest.get_position_from_hash(hash)
+end
+
+local function bookmarks(player)
+	local data = player:get_meta():get_string(modname) or ""
+	data = data ~= "" and minetest.deserialize(data) or {}
+	return data, function()
+		player:get_meta():set_string(modname, minetest.serialize(data))
+	end
+end
+
+local function bkfind(player, str)
+	local data = bookmarks(player)
+	if not data then return nil, 'no match' end
+
+	if data[str] then return {{k = str, v = data[str]}} end
+
+	local found = {}
+	for k, v in pairs(data) do
+		if k:sub(1, #str) == str then found[#found + 1] = {k = k, v = v} end
+	end
+	if #found > 0 then return found end
+
+	local pat = str:gsub("([^%w])", "%%%1")
+	for k, v in pairs(data) do
+		if k:match(pat) then found[#found + 1] = {k = k, v = v} end
+	end
+	return found
+end
+
+local function tcfind(player, str)
+	local pos = tcdecode(str)
+	if pos then return pos end
+
+	local found = bkfind(player, str)
+	if #found == 1 then return found[1].v end
+	if #found > 1 then return nil, 'ambiguous' end
+	return nil, 'no match'
 end
 
 local function poof(pos)
@@ -92,9 +130,9 @@ minetest.register_chatcommand("tc", {
 				return true, "telecode for your location: " .. tcencode(player:get_pos())
 			end
 
-			local pos = tcdecode(param)
+			local pos, err = tcfind(player, param)
 			if not pos then
-				return false, "invalid telecode"
+				return false, "telecode not found: " .. err
 			end
 
 			local invdata = player:get_inventory():get_lists()
@@ -112,5 +150,68 @@ minetest.register_chatcommand("tc", {
 			player:set_pos(pos)
 			poof(pos)
 			return true, "teleported to " .. tcencode(pos)
+		end
+	})
+
+minetest.register_chatcommand("tcsave", {
+		description = "Save telecode bookmark",
+		params = "<name> [telecode]",
+		func = function(pname, param)
+			local player = minetest.get_player_by_name(pname)
+			if not player then return false, "must be in game world" end
+
+			local words = param:split(' ')
+			for i = #words, 1, -1 do
+				if not words[i]:match("%S") then
+					table_remove(words, i)
+				end
+			end
+			if #words < 1 then return false, "name required" end
+
+			local pos = tcdecode(words[#words])
+			if pos then
+				words[#words] = nil
+			else
+				pos = vector.round(player:get_pos())
+			end
+			local keyname = table_concat(words, " ")
+
+			local data, save = bookmarks(player)
+			data[keyname] = pos
+			save()
+
+			return true, tcencode(pos) .. " saved as " .. keyname
+		end
+	})
+
+minetest.register_chatcommand("tcls", {
+		description = "List telecode bookmarks",
+		params = "<search>",
+		func = function(pname, param)
+			local player = minetest.get_player_by_name(pname)
+			if not player then return false, "must be in game world" end
+
+			local found = bkfind(player, param)
+			if #found < 1 then return false, "no match found" end
+			table_sort(found, function(a, b) return a.k < b.k end)
+
+			for _, e in ipairs(found) do
+				minetest.chat_send_player(pname, "- " .. tcencode(e.v)
+					.. ": " .. e.k)
+			end
+		end
+	})
+
+minetest.register_chatcommand("tcrm", {
+		description = "Remove telecode bookmark",
+		params = "<name>",
+		func = function(pname, param)
+			local player = minetest.get_player_by_name(pname)
+			if not player then return false, "must be in game world" end
+
+			local data, save = bookmarks(player)
+			if not data[param] then return false, "bookmark not found" end
+			data[param] = nil
+			save()
 		end
 	})
