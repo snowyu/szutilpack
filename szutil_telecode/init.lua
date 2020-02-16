@@ -29,10 +29,12 @@ local function tcencode(pos)
 	end
 	hash = table_concat(chars)
 
-	return hash .. cksum
+	return hash:sub(1, 4) .. "-" .. hash:sub(5, 8) .. "-"
+	.. hash:sub(9, 12) .. "-" .. cksum
 end
 
 local function tcdecode(str)
+	str = str:gsub("-", "")
 	if not str:match("^[0-9a-f]*$") then return end
 	if #str ~= 16 then return end
 
@@ -109,6 +111,6 @@ minetest.register_chatcommand("tc", {
 			poof(player:get_pos())
 			player:set_pos(pos)
 			poof(pos)
-			return true, "teleported to " .. param
+			return true, "teleported to " .. tcencode(pos)
 		end
 	})
