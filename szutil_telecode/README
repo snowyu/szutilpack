@@ -13,6 +13,14 @@ equality) without knowing the server's private encryption key.  Keys
 are per-server/per-world, so telecodes from one world, or from single
 player, cannot be used on a different server.
 
+The mod also provides some bookmarking capabilities so players only
+need to deal with the codes when they want to share/publish them.
+- /tcsave <name> - save current location to a bookmark.
+- /tcsave <name> [code] - save location from telecode as bookmark.
+- /tcls - list all bookmarks
+- /tcls <search> - list all bookmarks matching search
+- /trcm <name> - remove a bookmark
+
 Players must be able to physically travel to a location to find the
 telecode for it, but may then later freely travel to that location at
 any time, and/or share the code with anyone they want via any means
