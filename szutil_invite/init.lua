@@ -1,10 +1,10 @@
 -- LUALOCALS < ---------------------------------------------------------
 local math, minetest, os, pairs, string, table, tonumber
     = math, minetest, os, pairs, string, table, tonumber
-local math_floor, math_pow, math_random, os_time, string_format,
-      string_match, table_concat
-    = math.floor, math.pow, math.random, os.time, string.format,
-      string.match, table.concat
+local math_floor, math_pow, os_time, string_format, string_match,
+      table_concat
+    = math.floor, math.pow, os.time, string.format, string.match,
+      table.concat
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -143,21 +143,7 @@ minetest.register_chatcommand("invites", {
 	})
 
 local function dumpitems(player)
-	local pos = vector.round(player:get_pos())
-	pos.y = pos.y + player:get_properties().eye_height
-	local inv = player:get_inventory()
-	for lname, list in pairs(inv:get_lists()) do
-		for i, stack in pairs(list) do
-			if not stack:is_empty() then
-				minetest.add_item({
-						x = pos.x + math_random() * 0.8 - 0.5,
-						y = pos.y + math_random() * 0.8 - 0.5,
-						z = pos.z + math_random() * 0.8 - 0.5,
-					}, stack)
-			end
-			inv:set_stack(lname, i, "")
-		end
-	end
+	return nodecore and nodecore.inventory_dump and nodecore.inventory_dump(player)
 end
 
 minetest.register_chatcommand("visit", {

@@ -135,15 +135,8 @@ minetest.register_chatcommand("tc", {
 				return false, "telecode not found: " .. err
 			end
 
-			local invdata = player:get_inventory():get_lists()
-			for lname, list in pairs(invdata) do
-				if lname ~= "hand" then
-					for _, stack in pairs(list) do
-						if not (stack:is_empty() or nodecore and nodecore.item_is_virtual(stack)) then
-							return false, "inventory not empty"
-						end
-					end
-				end
+			if nodecore and nodecore.inventory_dump then
+				nodecore.inventory_dump(player)
 			end
 
 			poof(player:get_pos())
