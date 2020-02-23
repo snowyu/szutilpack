@@ -142,7 +142,7 @@ minetest.register_chatcommand("tc", {
 			poof(player:get_pos())
 			player:set_pos(pos)
 			poof(pos)
-			return true, "teleported to " .. tcencode(pos)
+			return true
 		end
 	})
 
