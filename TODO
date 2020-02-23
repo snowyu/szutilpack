@@ -11,7 +11,4 @@
 - Make szutil_invite accept multiple invitee names, w/ commas, maybe
   even globs/wildcards?
 
-- Make szuti_invite notify inviter when invitee visits/departs, add
-  sound/particles to teleport?
-
 ------------------------------------------------------------------------

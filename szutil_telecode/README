@@ -20,15 +20,25 @@ need to deal with the codes when they want to share/publish them.
 - /tcls - list all bookmarks
 - /tcls <search> - list all bookmarks matching search
 - /trcm <name> - remove a bookmark
+- /tcsend * <name> - share a bookmark with everyone via chat
+- /tcsend <player> <name> - share a bookmark with player via DM
+- /tcsend * - share current location telecode with everyone
+- /tcsend <player> - send current location to player via DM
 
 Players must be able to physically travel to a location to find the
 telecode for it, but may then later freely travel to that location at
 any time, and/or share the code with anyone they want via any means
 at their disposal, such as in-game chat, posting on wikis/forums, etc.
 
-This mod is compatible with NodeCore, both in that it ignores special
-"virtual" items like injury/burn, and that it disallows carrying your
-items with you when you teleport (inventory must be completely empty)
-to avoid breaking gameplay.
+Valid new telecodes that are received via chat or DM are automatically
+saved in bookmarks, named ^, ^2, ^3, ^4, and ^5, in order of most
+recently received, except for any telecodes already bookmarked.
+These special bookmarks can also be used in the place of an explicit
+code for /tcsave.
+
+This mod is compatible with NodeCore, and follows NodeCore's item
+transport restrictions.  When the game is NodeCore, players can move
+about freely, but items must be left behind when using a
+non-gameplay-integrated teleportation system like this.
 
 ------------------------------------------------------------------------
