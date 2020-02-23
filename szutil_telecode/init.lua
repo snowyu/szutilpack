@@ -10,6 +10,8 @@ local modname = minetest.get_current_modname()
 local worldkey = minetest.settings:get(modname .. "_key") or ""
 if #worldkey < 1 then error(modname .. "_key must be set!") end
 
+local recent = tonumber(minetest.settings:get(modname .. "_recent")) or 5
+
 local function tcencode(pos)
 	pos = vector.round(pos)
 
@@ -96,6 +98,56 @@ local function tcfind(player, str)
 	return nil, 'no match'
 end
 
+local function tccatch(player, str)
+	local data, save, known, dirty
+	local words = str:split(' ')
+	for i = 1, #words do
+		local pos = tcdecode(words[i])
+		if pos then
+			if not data then
+				data, save = bookmarks(player)
+				known = {}
+				for _, v in pairs(data) do
+					known[minetest.pos_to_string(v)] = true
+				end
+			end
+			local key = minetest.pos_to_string(pos)
+			if not known[key] then
+				known[key] = true
+				if data["^" .. recent] then
+					known[minetest.pos_to_string(data["^" .. recent])] = nil
+				end
+				for j = recent, 3, -1 do
+					data["^" .. j] = data["^" .. (j - 1)]
+				end
+				data["^2"] = data["^"]
+				data["^"] = pos
+				dirty = true
+			end
+		end
+	end
+	if dirty then save() end
+end
+local old_all = minetest.chat_send_all
+function minetest.chat_send_all(msg, ...)
+	if msg and type(msg) == "string" then
+		for _, player in pairs(minetest.get_connected_players()) do
+			tccatch(player, msg)
+		end
+	end
+	return old_all(msg, ...)
+end
+local old_send = minetest.chat_send_player
+function minetest.chat_send_player(pname, msg, ...)
+	if msg and type(msg) == "string" then
+		local player = minetest.get_player_by_name(pname)
+		if player then
+			tccatch(player, msg)
+		end
+	end
+	return old_send(pname, msg, ...)
+end
+
 local function poof(pos)
 	minetest.add_particlespawner({
 			amount = 200,
@@ -139,7 +191,9 @@ minetest.register_chatcommand("tc", {
 				nodecore.inventory_dump(player)
 			end
 
-			poof(player:get_pos())
+			local opos = player:get_pos()
+			tccatch(player, tcencode(opos))
+			poof(opos)
 			player:set_pos(pos)
 			poof(pos)
 			return true
@@ -161,7 +215,9 @@ minetest.register_chatcommand("tcsave", {
 			end
 			if #words < 1 then return false, "name required" end
 
-			local pos = tcdecode(words[#words])
+			local pos = words[#words]:match("^%^+$")
+			and tcfind(player, words[#words])
+			or tcdecode(words[#words])
 			if pos then
 				words[#words] = nil
 			else
@@ -190,7 +246,7 @@ minetest.register_chatcommand("tcls", {
 
 			for _, e in ipairs(found) do
 				minetest.chat_send_player(pname, "- " .. tcencode(e.v)
-					.. ": " .. e.k)
+					.. ": " .. e.k .. " " .. minetest.pos_to_string(e.v))
 			end
 		end
 	})
