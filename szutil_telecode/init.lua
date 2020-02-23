@@ -246,7 +246,7 @@ minetest.register_chatcommand("tcls", {
 
 			for _, e in ipairs(found) do
 				minetest.chat_send_player(pname, "- " .. tcencode(e.v)
-					.. ": " .. e.k .. " " .. minetest.pos_to_string(e.v))
+					.. ": " .. e.k)
 			end
 		end
 	})
@@ -262,5 +262,42 @@ minetest.register_chatcommand("tcrm", {
 			if not data[param] then return false, "bookmark not found" end
 			data[param] = nil
 			save()
+		end
+	})
+
+minetest.register_chatcommand("tcsend", {
+		description = "Share telecode",
+		params = "<*|player> [search]",
+		func = function(pname, param)
+			local player = minetest.get_player_by_name(pname)
+			if not player then return false, "must be in game world" end
+
+			local dest, name = param:match("(%S+)%s*(.*)")
+
+			local send
+			if dest == "*" then
+				send = function(t)
+					return minetest.chat_send_all("telecode shared by "
+						.. pname .. ": " .. t)
+				end
+			else
+				local targ = minetest.get_player_by_name(dest)
+				if not targ then return false, "player not found" end
+				send = function(t)
+					return minetest.chat_send_player(dest,
+						"telecode privately sent by " .. pname .. ": " .. t),
+					"telecode sent"
+				end
+			end
+
+			local pos
+			if name ~= "" then
+				pos = tcfind(player, name)
+				if not pos then return false, "location not found" end
+			else
+				pos = vector.round(player:get_pos())
+			end
+
+			return send(tcencode(pos))
 		end
 	})
