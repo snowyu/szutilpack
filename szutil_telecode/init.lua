@@ -280,7 +280,7 @@ minetest.register_chatcommand("tcsend", {
 					return minetest.chat_send_all("telecode shared by "
 						.. pname .. ": " .. t)
 				end
-			else
+			elseif dest then
 				local targ = minetest.get_player_by_name(dest)
 				if not targ then return false, "player not found" end
 				send = function(t)
@@ -288,10 +288,12 @@ minetest.register_chatcommand("tcsend", {
 						"telecode privately sent by " .. pname .. ": " .. t),
 					"telecode sent"
 				end
+			else
+				return false, "share target not specified"
 			end
 
 			local pos
-			if name ~= "" then
+			if name and name ~= "" then
 				pos = tcfind(player, name)
 				if not pos then return false, "location not found" end
 			else
