@@ -25,10 +25,10 @@ local function sendall(isann)
 	if not isann then return end
 
 	local now = minetest.get_us_time() / 1000000
-	if (lines < linedelay) or (now < exp) then return end
-
+	if (lines < linedelay) and (now < exp) then return end
 	exp = now + timedelay
 	lines = 0
+
 	local names = {}
 	for _, player in pairs(minetest.get_connected_players()) do
 		if not minetest.check_player_privs(player, "stealth") then
