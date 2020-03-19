@@ -25,7 +25,8 @@ local function parsespec(param)
 	return config
 end
 
-local default = parsespec("0.5:1.2 0.25 0.25 0.25:0.8 0")
+local default = parsespec(minetest.settings:get(modname)
+	or "0.5:1.2 0.25 0.25 0.25:0.8 0")
 
 local function dosound(player, pname, msgtype)
 	local config = player:get_meta():get_string(modname) or ""

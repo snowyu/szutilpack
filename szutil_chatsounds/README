@@ -1,0 +1,25 @@
+------------------------------------------------------------------------
+
+This mod adds a per-player-configurable beep sound for incoming messages
+in the in-game chat stream, to allow players on low-traffic servers not
+to miss interesting goings-on in chat.
+
+Players can use the /szutil_chatsounds command to rewrite their own
+chat configuration.  Sound configuration is in the form of "gain" or
+"gain:pitch" (where pitch is a multiplier, 1 is the default 440Hz tone)
+for each of the message levels:
+	- DMs
+	- public chat
+	- emotes
+	- player join/part
+	- server messages
+	- other
+If there is no config for a message level then the last config will be
+used.  Setting the last config to 0 mutes all remaining message levels.
+Setting the entire config to 0 mutes EVERYTHING.
+
+The default sound level can be configured server-wide.  The built-in
+default if not overridden at the server/player level is:
+	0.5:1.2 0.25 0.25 0.25:0.8 0
+
+------------------------------------------------------------------------
