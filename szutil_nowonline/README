@@ -1,0 +1,16 @@
+------------------------------------------------------------------------
+
+When players log in or log out, reannounce the cumulative list of online
+players.  This is particularly useful for szutil_chatsocket connections
+to external chat bridges, where no command is provided for getting the
+list of online players.
+
+Player lists are only sent if either a certain amount of time has
+passed, or a certain number of public chat lines, since the last
+announcement (configurable) to prevent a ton of noise on busy servers.
+
+The maximum number of names listed is configurable; beyond that limit,
+a random sample of players will be shown, and "(# more)" displayed at
+the end of the list.
+
+------------------------------------------------------------------------
