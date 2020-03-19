@@ -1,6 +1,7 @@
 A pack of independent utilities, including:
 
 - `szutil_chatsocket`: Expose in-game chat stream as a unix-domain socket for arbitrary chat integrations.
+- `szutil_chatsounds`: Configurable beep notifications for in-game chat.
 - `szutil_clocksync`: Synchronize in-game clock smoothly with real-time clock so users can log in at predictable times of day.
 - `szutil_consocket`: Expose an admin console as a unix-domain socket for clientless admin via ssh.
 - `szutil_controlhud`: Togglable on-screen input control HUD, useful for demo recording.
@@ -10,6 +11,7 @@ A pack of independent utilities, including:
 - `szutil_limitworld`: Limit mapgen to a floating hemisphere, with players taking damage if they fall off.
 - `szutil_logtrace`: Allow privileged players to monitor server debug trace in chat.
 - `szutil_motd`: Display a formspec MOTD to players on login, only if updated since the last view.
+- `szutil_nowonline`: Periodically display cumulative list of online players, for chat bridges.
 - `szutil_roles`: Manage privs via special privs that represent groups of other privs.
 - `szutil_spiralhomes`: New players are assigned initial spawn locations dispersed around the world in an outward spiral.
 - `szutil_stealth`: Make a player as close to completely invisble to players as possible, for moderation or spectation use.
