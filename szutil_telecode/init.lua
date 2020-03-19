@@ -73,7 +73,7 @@ local function bkfind(player, str)
 	local data = bookmarks(player)
 	if not data then return nil, 'no match' end
 
-	if data[str] then return {{k = str, v = data[str]}} end
+	if str ~= "" and data[str] then return {{k = str, v = data[str]}} end
 
 	local found = {}
 	for k, v in pairs(data) do
@@ -224,6 +224,9 @@ minetest.register_chatcommand("tcsave", {
 				pos = vector.round(player:get_pos())
 			end
 			local keyname = table_concat(words, " ")
+			if not keyname:match("%S") then
+				return false, "name cannot be blank"
+			end
 
 			local data, save = bookmarks(player)
 			data[keyname] = pos
