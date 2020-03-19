@@ -31,7 +31,9 @@ local function sendall(isann)
 	lines = 0
 	local names = {}
 	for _, player in pairs(minetest.get_connected_players()) do
-		names[#names + 1] = player:get_player_name()
+		if not minetest.check_player_privs(player, "stealth") then
+			names[#names + 1] = player:get_player_name()
+		end
 	end
 	table_sort(names)
 
