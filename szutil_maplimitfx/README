@@ -1,0 +1,13 @@
+------------------------------------------------------------------------
+
+This mod displays a particle effect at the hard map boundary, allowing
+players to visualize the difference between areas not yet loaded and
+a tangible boundary.
+
+It automatically uses the built-in mapgen_limit map setting.
+
+No nodes are altered in this process, so the limit can be raised later
+by simply modifying the map_meta.txt of the world.  When the world is
+reloaded, the new limit will be honored by this mod.
+
+------------------------------------------------------------------------

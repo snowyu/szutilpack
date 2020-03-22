@@ -10,6 +10,7 @@ A pack of independent utilities, including:
 - `szutil_lagometer`: Optional on-screen server performance meter HUD.
 - `szutil_limitworld`: Limit mapgen to a floating hemisphere, with players taking damage if they fall off.
 - `szutil_logtrace`: Allow privileged players to monitor server debug trace in chat.
+- `szutil_maplimitfx`: Display particle visual at hard map boundaries.
 - `szutil_motd`: Display a formspec MOTD to players on login, only if updated since the last view.
 - `szutil_nowonline`: Periodically display cumulative list of online players, for chat bridges.
 - `szutil_roles`: Manage privs via special privs that represent groups of other privs.
