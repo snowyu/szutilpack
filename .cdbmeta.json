@@ -2,7 +2,7 @@
 	"type": "mod",
 	"title": "SzUtilPack",
 	"short_desc": "A collection of misc dependency-free utilities primarily for server hosts.",
-	"tags": "maintenance",
+	"tags": "maintenance, transport, player effects, environment, API",
 	"license": "mit",
 	"media_license": "mit",
 	"provides_str": null,
