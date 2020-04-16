@@ -14,21 +14,7 @@ local maxnames = tonumber(minetest.settings:get(modname .. "_names")) or 50
 local lines = 0
 local exp = 0
 
-local function delaymsg(msg)
-	return minetest.after(0, function()
-			return minetest.chat_send_all(msg)
-		end)
-end
-
-local function sendall(isann)
-	lines = lines + 1
-	if not isann then return end
-
-	local now = minetest.get_us_time() / 1000000
-	if (lines < linedelay) and (now < exp) then return end
-	exp = now + timedelay
-	lines = 0
-
+local function announce()
 	local names = {}
 	for _, player in pairs(minetest.get_connected_players()) do
 		if not minetest.check_player_privs(player, "stealth") then
@@ -47,10 +33,22 @@ local function sendall(isann)
 	end
 
 	if #names > 0 then
-		delaymsg("*** Online: " .. table_concat(names, ", "))
+		minetest.chat_send_all("*** Online: " .. table_concat(names, ", "))
 	else
-		delaymsg("*** Server is empty.")
+		minetest.chat_send_all("*** Server is empty.")
 	end
+end
+
+local function sendall(isann)
+	lines = lines + 1
+	if not isann then return end
+
+	local now = minetest.get_us_time() / 1000000
+	if (lines < linedelay) and (now < exp) then return end
+	exp = now + timedelay
+	lines = 0
+
+	minetest.after(0, announce)
 end
 
 do
