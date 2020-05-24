@@ -1,6 +1,8 @@
 -- LUALOCALS < ---------------------------------------------------------
-local ipairs, minetest, pairs, tonumber, tostring
-    = ipairs, minetest, pairs, tonumber, tostring
+local ipairs, minetest, pairs, table, tonumber, tostring
+    = ipairs, minetest, pairs, table, tonumber, tostring
+local table_concat
+    = table.concat
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -46,16 +48,37 @@ end
 
 minetest.register_chatcommand(modname, {
 		description = "change chat sound configuration",
-		params = "<gain[:pitch] for DM> [... for chat] [...emote]"
+		params = "default or <gain[:pitch] for DM> [... for chat] [...emote]"
 		.. " [...join/part] [...server] [...other]",
 		func = function(pname, param)
 			local player = minetest.get_player_by_name(pname)
 			if not player then return false, "player not connected" end
 
+			if param == "" then
+				local config = player:get_meta():get_string(modname) or ""
+				config = config ~= "" and minetest.deserialize(config) or nil
+				config = config and #config > 0 and config or default
+				local t = {}
+				for _, e in ipairs(config) do
+					if e.pitch then
+						t[#t + 1] = e.gain .. ":" .. e.pitch
+					else
+						t[#t + 1] = e.gain
+					end
+				end
+				return true, "current config: " .. table_concat(t)
+			end
+
+			if param == "default" then
+				player:get_meta():set_string(modname, "")
+				return false, "reset to default"
+			end
+
 			local config = parsespec(param)
 			if #config < 1 then return false, "empty config" end
 
 			player:get_meta():set_string(modname, minetest.serialize(config))
+			return true, "config changed"
 		end
 	})
 
