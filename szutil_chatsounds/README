@@ -18,6 +18,12 @@ If there is no config for a message level then the last config will be
 used.  Setting the last config to 0 mutes all remaining message levels.
 Setting the entire config to 0 mutes EVERYTHING.
 
+Using "/szutil_chatsounds" with no parameters queries the current
+settings.
+
+Using "/szutil_chatsounds default" resets the config to the server or
+built-in default.
+
 The default sound level can be configured server-wide.  The built-in
 default if not overridden at the server/player level is:
 	0.5:1.2 0.25 0.25 0.25:0.8 0
