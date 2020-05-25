@@ -8,7 +8,4 @@
 - szutil_watch needs to save player inventory, watch for race
   conditions.
 
-- Make szutil_invite accept multiple invitee names, w/ commas, maybe
-  even globs/wildcards?
-
 ------------------------------------------------------------------------
