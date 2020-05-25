@@ -11,13 +11,11 @@ that other roles depend on may affect all dependant roles.
 
 There are a few special built-in roles:
 	all - all privileges
-	none - remove all existing privileges
 	default - the set of privileges assigned to new players
 The built-in roles cannot be redefined.
 
 /grant and /grantme can be used to grant roles the same as privs.
-First, all roles are expanded into their privs.  If the "none" role
-is included, then it's applied before any other privs.
+First, all roles are expanded into their privs.
 
 Revoking a role effectively revokes all privs it grants.
 

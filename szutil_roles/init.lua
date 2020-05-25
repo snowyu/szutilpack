@@ -9,7 +9,6 @@ local modstore = minetest.get_mod_storage()
 
 local special = {
 	all = true,
-	none = true,
 	default = true
 }
 
@@ -61,9 +60,8 @@ minetest.register_chatcommand("role", {
 local function union(t, f) for k in pairs(f) do t[k] = true end return t end
 
 local privexpand = minetest.string_to_privs
-local getprivs = minetest.get_player_privs
 
-local function expandroles(pname, privs, invert)
+local function expandroles(privs)
 	local seen = union({}, special)
 	local dirty = true
 	while dirty do
@@ -90,11 +88,6 @@ local function expandroles(pname, privs, invert)
 		end
 		privs = newpriv
 	end
-	if invert or privs.none then
-		privs.none = nil
-	else
-		union(privs, getprivs(pname))
-	end
 	if privs.default then
 		union(privs, privexpand(minetest.settings:get("default_privs")))
 		privs.default = nil
@@ -102,42 +95,9 @@ local function expandroles(pname, privs, invert)
 	return privs
 end
 
-local function cmdmod(cmd, paramfunc, invert)
-	local def = minetest.registered_chatcommands[cmd]
-	if def then
-		local oldfunc = def.func
-		rawset(def, "func", function(pname, param, ...)
-				local gname, privs = paramfunc(pname, param, ...)
-				if privs == "all" then param = param .. ",all" end
-				local oldstp = minetest.string_to_privs
-				function minetest.string_to_privs()
-					minetest.string_to_privs = oldstp
-					return expandroles(gname, privexpand(privs), invert)
-				end
-				local oldget = minetest.get_player_privs
-				if not invert then
-					local once
-					function minetest.get_player_privs(pn, ...)
-						if not once then
-							once = true
-							return oldget(pn, ...)
-						end
-						minetest.get_player_privs = oldget
-						return {}
-					end
-				end
-				local function helper(...)
-					minetest.string_to_privs = oldstp
-					minetest.get_player_privs = oldget
-					return ...
-				end
-				return helper(oldfunc(pname, param, ...))
-			end)
-	end
+function minetest.string_to_privs(privs)
+	return expandroles(privexpand(privs))
 end
-cmdmod("grant", function(_, param) return string_match(param, "([^ ]+) (.+)") end)
-cmdmod("grantme", function(n, param) return n, param end)
-cmdmod("revoke", function(_, param) return string_match(param, "([^ ]+) (.+)") end, true)
 
 local revoke = minetest.registered_chatcommands.revoke
 if revoke and not minetest.registered_chatcommands.revokeme then
