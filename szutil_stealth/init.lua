@@ -9,7 +9,7 @@ local function isstealth(player)
 	if type(player) == "string" then
 		player = minetest.get_player_by_name(player)
 	end
-	if not player then return end
+	if not (player and player.is_player and player:is_player()) then return end
 	return minetest.check_player_privs(player, "stealth")
 end
 
