@@ -28,7 +28,7 @@ local function parsespec(param)
 end
 
 local default = parsespec(minetest.settings:get(modname)
-	or "0.5:1.2 0.25 0.25 0.25:0.8 0")
+	or "0.5:1.2 0.5:1.1 0.25 0.25 0.25:0.8 0")
 
 local function dosound(player, pname, msgtype)
 	local config = player:get_meta():get_string(modname) or ""
@@ -48,8 +48,8 @@ end
 
 minetest.register_chatcommand(modname, {
 		description = "change chat sound configuration",
-		params = "default or <gain[:pitch] for DM> [... for chat] [...emote]"
-		.. " [...join/part] [...server] [...other]",
+		params = "default or <gain[:pitch] for DM> [... for mention] "
+		.. " [... chat] [...emote] [...join/part] [...server] [...other]",
 		func = function(pname, param)
 			local player = minetest.get_player_by_name(pname)
 			if not player then return false, "player not connected" end
@@ -98,10 +98,15 @@ local function send(pname, text)
 
 	local msgtype
 	if text:match("^%s*DM%sfrom%s") then msgtype = 1 -- DM
-	elseif text:match("^%s*%<") then msgtype = 2 -- public chat
-	elseif text:match("^%s*%*%s") then msgtype = 3 -- emotes
-	elseif text:match("^%s*%*%*%*%s") then msgtype = 4 -- join/part
-	elseif text:match("^%s*%#%s") then msgtype = 5 -- server
+	elseif text:match("^%s*%<") then
+		if text:lower():match(">.*" .. pname:lower():gsub("([^%w])", "%%%1")) then
+			msgtype = 2 -- mention in public chat
+		else
+			msgtype = 3 -- public chat
+		end
+	elseif text:match("^%s*%*%s") then msgtype = 4 -- emotes
+	elseif text:match("^%s*%*%*%*%s") then msgtype = 5 -- join/part
+	elseif text:match("^%s*%#%s") then msgtype = 6 -- server
 	else msgtype = 6 end -- unknown/misc
 
 	local n = pending[pname] or msgtype
