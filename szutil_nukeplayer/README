@@ -1,0 +1,14 @@
+------------------------------------------------------------------------
+
+Adds a /nuke_player command, which removes a player COMPLETELY,
+including all player data (as per /remove_player), privileges,
+password, and other account info.
+
+This level of destruction is necessary for minetest.player_exists to
+return false and allow mods to detect the destruction of the player
+account for automatic cleanup purposes.
+
+Because it affects account privileges and can be used to destroy
+admin accounts, the superuser "privs" priv is required to use it.
+
+------------------------------------------------------------------------
