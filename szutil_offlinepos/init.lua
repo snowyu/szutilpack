@@ -69,7 +69,25 @@ local function trackset(pname, param, value)
 	local player = minetest.get_player_by_name(pname)
 	if not player then return false, "Cannot track while offline" end
 
-	local set = matchplayers(param)
+	local set
+	if (not param) or (param == "") then
+		if value then
+			set = {}
+			for _, p in pairs(minetest.get_connected_players()) do
+				local n = p:get_player_name()
+				set[n] = {
+					name = n,
+					pos = p:get_pos(),
+					player = p
+				}
+			end
+		else
+			set = matchplayers(".")
+		end
+	else
+		set = matchplayers(param)
+	end
+
 	local tracking = gettracking(player, pname)
 	for k in pairs(set) do
 		if k ~= pname then tracking[k] = value end
@@ -168,6 +186,15 @@ minetest.register_globalstep(function()
 				end
 			end
 		end
+		local storetbl = modstore:to_table()
+		local dirty
+		for k in pairs(storetbl.fields) do
+			if not minetest.player_exists(k) then
+				storetbl.fields[k] = nil
+				dirty = true
+			end
+		end
+		if dirty then modstore:from_table(storetbl) end
 	end)
 
 local teleport = minetest.registered_chatcommands.teleport
