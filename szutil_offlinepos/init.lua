@@ -92,6 +92,11 @@ local function trackset(pname, param, value)
 	for k in pairs(set) do
 		if k ~= pname then tracking[k] = value end
 	end
+	for k in pairs(tracking) do
+		if not minetest.player_exists(k) then
+			tracking[k] = nil
+		end
+	end
 
 	trackcache[pname] = tracking
 	player:get_meta():set_string(modname, minetest.serialize(tracking))
@@ -127,13 +132,11 @@ minetest.register_globalstep(function()
 			local pname = player:get_player_name()
 			modstore:set_string(pname, minetest.pos_to_string(player:get_pos()))
 
-			local tracking = {}
-			if minetest.check_player_privs(pname, modname) then
-				tracking = gettracking(player, pname)
-			end
+			local tracking = gettracking(player, pname)
 
 			local phuds = huds[pname]
 			if not phuds then
+				if not pairs(tracking)(tracking) then return end
 				phuds = {}
 				huds[pname] = phuds
 			end
@@ -185,6 +188,7 @@ minetest.register_globalstep(function()
 					phuds[k] = nil
 				end
 			end
+			if not pairs(phuds)(phuds) then huds[pname] = nil end
 		end
 		local storetbl = modstore:to_table()
 		local dirty
