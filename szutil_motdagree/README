@@ -1,0 +1,24 @@
+------------------------------------------------------------------------
+
+This mod requires new players to accept terms of use in the MOTD via a
+chat command before they can play.
+
+- Remove interact (and possibly other privs) from default_privs.
+- Add any additional privs to szutil_motdagree_grant.
+
+Players will be required to enter the specified chat comamnd (default
+is "/agree to terms") to gain the sequestered privileges and start
+actual play.  This self-grant via agreeing to the terms only works once,
+so admins can still revoke these privs manually later.
+
+Customizing the chat command and required parameters allows this mod
+to test for reading comprehension (by burying the chat command
+instructions inside the MOTD), and ensure that players are not just
+ignoring the rules and agreeing just to dismiss the message, and thus
+players have no excuse for ignoring warnings.
+
+Optionally, by setting szutil_motdagree_purge to true, users who log off
+without agreeing to the terms will be purged from the system and need
+to re-register each time until they agree to the terms.
+
+------------------------------------------------------------------------
