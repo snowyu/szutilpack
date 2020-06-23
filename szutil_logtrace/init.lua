@@ -21,6 +21,9 @@ minetest.register_chatcommand("logtrace", {
 		end,
 	})
 
+local started
+minetest.after(0, function() started = true end)
+
 local function logtrace(...)
 	local t = {"#", ...}
 	for i, v in ipairs(t) do
@@ -42,7 +45,7 @@ end
 
 local function tracify(func)
 	return function(...)
-		logtrace(...)
+		if started then logtrace(...) end
 		return func(...)
 	end
 end

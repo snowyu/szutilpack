@@ -98,7 +98,7 @@ local function update()
 	publish()
 	minetest.after(interval, update)
 end
-update()
+minetest.after(0, update)
 
 -- Do the lag estimate work in a globalstep. If the lag spikes
 -- up, publish immediately; if not, allow the timer to publish as
