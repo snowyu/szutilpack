@@ -53,7 +53,6 @@ do
 			local cp = ie.io.popen("lua5.1 -e 'print(package.cpath)'")
 			or ie.io.popen("lua51 -e 'print(package.cpath)'")
 			or ie.io.popen("lua -e 'print(package.cpath)'")
-			or ie.io.popen("luajit -e 'print(package.cpath)'")
 			or error("failed to execute lua")
 			ie.package.cpath = cp:read("*all")
 		end)
