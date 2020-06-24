@@ -1,6 +1,6 @@
 -- LUALOCALS < ---------------------------------------------------------
-local assert, error, minetest, os, pairs, string, tostring
-    = assert, error, minetest, os, pairs, string, tostring
+local assert, error, minetest, os, pairs, pcall, string, tostring
+    = assert, error, minetest, os, pairs, pcall, string, tostring
 local os_remove, string_gsub, string_match
     = os.remove, string.gsub, string.match
 -- LUALOCALS > ---------------------------------------------------------
@@ -49,6 +49,13 @@ local master
 do
 	local ie = minetest.request_insecure_environment()
 	if not ie then return error(modname .. " must be listed in secure.trusted_mods") end
+	pcall(function()
+			local cp = ie.io.popen("lua5.1 -e 'print(package.cpath)'")
+			or ie.io.popen("lua51 -e 'print(package.cpath)'")
+			or ie.io.popen("lua -e 'print(package.cpath)'")
+			or error("failed to execute lua")
+			ie.package.cpath = cp:read("*all")
+		end)
 	master = assert(ie.require("socket.unix")())
 	assert(master:settimeout(0))
 	local sockpath = minetest.get_worldpath() .. "/" .. modname .. ".sock"
