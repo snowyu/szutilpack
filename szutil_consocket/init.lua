@@ -1,8 +1,8 @@
 -- LUALOCALS < ---------------------------------------------------------
-local assert, error, ipairs, minetest, os, pairs, pcall, require,
-      string, tostring
-    = assert, error, ipairs, minetest, os, pairs, pcall, require,
-      string, tostring
+local assert, error, ipairs, minetest, os, pairs, pcall, string,
+      tostring
+    = assert, error, ipairs, minetest, os, pairs, pcall, string,
+      tostring
 local os_remove, string_gsub, string_lower, string_match
     = os.remove, string.gsub, string.lower, string.match
 -- LUALOCALS > ---------------------------------------------------------
@@ -86,12 +86,24 @@ local clients = {}
 -- Create a listening unix-domain socket inside the world dir.
 -- All sockets and connections will be non-blocking, by setting
 -- timeout to zero, so we don't block the game engine.
-local master = assert(require("socket.unix")())
-assert(master:settimeout(0))
-local sockpath = minetest.get_worldpath() .. "/" .. modname .. ".sock"
-os_remove(sockpath)
-assert(master:bind(sockpath))
-assert(master:listen())
+local master
+do
+	local ie = minetest.request_insecure_environment()
+	if not ie then return error(modname .. " must be listed in secure.trusted_mods") end
+	pcall(function()
+			local cp = ie.io.popen("lua5.1 -e 'print(package.cpath)'")
+			or ie.io.popen("lua51 -e 'print(package.cpath)'")
+			or ie.io.popen("lua -e 'print(package.cpath)'")
+			or error("failed to execute lua")
+			ie.package.cpath = cp:read("*all")
+		end)
+	master = assert(ie.require("socket.unix")())
+	assert(master:settimeout(0))
+	local sockpath = minetest.get_worldpath() .. "/" .. modname .. ".sock"
+	os_remove(sockpath)
+	assert(master:bind(sockpath))
+	assert(master:listen())
+end
 
 -- Helper function to log console debugging information.
 local function clientlog(client, str)
