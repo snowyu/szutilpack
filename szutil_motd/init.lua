@@ -1,25 +1,54 @@
 -- LUALOCALS < ---------------------------------------------------------
-local io, minetest, tonumber
-    = io, minetest, tonumber
-local io_close, io_open
-    = io.close, io.open
+local io, minetest, string, tonumber
+    = io, minetest, string, tonumber
+local io_close, io_open, string_match
+    = io.close, io.open, string.match
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
 local modstore = minetest.get_mod_storage()
 
 -- Path to the extended motd file, stored in the world path.
-local motdpath = minetest.get_worldpath() .. "/" .. modname .. ".txt"
+
+-- Function to read current MOTD
+local readmotd
+do
+	local motdpath = minetest.get_worldpath() .. "/" .. modname .. ".txt"
+	readmotd = function()
+		local f = io_open(motdpath, "rb")
+		if not f then return end
+		local motd = f:read("*all")
+		io_close(f)
+		if not string_match(motd, "%S") then return end
+		return motd
+	end
+end
+
+-- Periodically scan for MOTD changes, and notify all online
+-- players if there are any.
+do
+	local motdinterval = tonumber(minetest.settings:get(modname .. "_interval"))
+	if motdinterval then
+		minetest.log("action", "polling motd for changes every " .. motdinterval .. "s")
+		local alertmotd = readmotd()
+		local function alertcheck()
+			minetest.after(motdinterval, alertcheck)
+			local motd = readmotd()
+			if motd == alertmotd then return end
+			minetest.chat_send_all("Updated MOTD. Please use /motd to review.")
+			alertmotd = motd
+		end
+		minetest.after(motdinterval, alertcheck)
+	end
+end
 
 -- Function to send the actual MOTD content to the player, in either
 -- automatic mode (on login) or "forced" mode (on player request).
 local function sendmotd(name, force)
 	-- Load the MOTD fresh on each request, so changes can be
 	-- made while the server is running, and take effect immediately.
-	local f = io_open(motdpath, "rb")
-	if not f then return end
-	local motd = f:read("*all")
-	io_close(f)
+	local motd = readmotd()
+	if not motd then return end
 
 	-- Compute a hash of the MOTD content, and figure out
 	-- if a player has already seen this version.

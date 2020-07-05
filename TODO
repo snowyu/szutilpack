@@ -6,9 +6,6 @@
 - MOTD mod should background-poll the MOTD file, and announce if there
   is an update.  Send a chat message?  Set a HUD?
 
-- Migrate my_agree from NodeCore server to new szutil_motd_agree mod.
-  - Don't forget to update priv name on existing server(s).
-
 - szutil_watch needs to save player inventory, watch for race
   conditions.
 
