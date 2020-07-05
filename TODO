@@ -12,4 +12,8 @@
 	- Add player search and disambiguation to teleport command.
 	- Add an optional short alias.
 
+- Lagometer improvements:
+	- Track more statistics (e.g. quintiles) to show distribution.
+	- Graph/histogram visualization w/ logarithmic buckets?
+
 ------------------------------------------------------------------------
