@@ -1,6 +1,6 @@
 -- LUALOCALS < ---------------------------------------------------------
-local error, math, minetest, os, pcall
-    = error, math, minetest, os, pcall
+local error, getmetatable, math, minetest, os, pcall
+    = error, getmetatable, math, minetest, os, pcall
 local math_random, os_time
     = math.random, os.time
 -- LUALOCALS > ---------------------------------------------------------
@@ -79,20 +79,21 @@ and minetest.chatcommands.set.func then
 		-- Wrap the built-in setting modification function to block
 		-- certain settings from being set during the execution of
 		-- this command.
-		local oldset = minetest.settings.set
-		minetest.settings.set = function(setting, ...)
+		local setmeta = getmetatable(minetest.settings) or minetest.settings
+		local oldset = setmeta.set
+		setmeta.set = function(obj, setting, ...)
 			if setting and (setting == "name"
 				or setting:sub(1, prefix:len()) == prefix) then
 				error("NEEDPRIVS")
 			end
-			return oldset(minetest.settings, setting, ...)
+			return oldset(obj, setting, ...)
 		end
 
 		-- Helper to handle result of command pcall; report our custom
 		-- error, bubble out other errors, otherwise return normally.
 		-- Restore the normal setting modification API after the command.
 		local function postset(ok, err, ...)
-			minetest.settings.set = oldset
+			setmeta.set = oldset
 			if ok then
 				return err, ...
 			else

@@ -8,10 +8,6 @@
   szutil_suadmin/init.lua:89: attempt to index field 'settings' (a
   userdata value)
 
-- Deprecation warnings for get_connected_players() at mod load time:
-  (at /config/.minetest/mods/szutilpack/szutil_lagometer/init.lua:56)
-  (at /config/.minetest/mods/szutilpack/szutil_logtrace/init.lua:32)
-
 - MOTD mod should background-poll the MOTD file, and announce if there
   is an update.  Send a chat message?  Set a HUD?
 
