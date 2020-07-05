@@ -181,7 +181,7 @@ local function dbflush(forcerpt)
 		or savedqty < 1) then return end
 
 	local function ms(i) return math_floor(i * 1000000) / 1000 end
-	minetest.log(modname .. ": recorded " .. savedqty .. " block(s) using "
+	minetest.log("action", modname .. ": recorded " .. savedqty .. " block(s) using "
 		.. ms(runtime) .. "ms out of " .. ms(alltime) .. "ms ("
 		.. (math_floor(runtime / alltime * 10000) / 100)
 		.. "%)")

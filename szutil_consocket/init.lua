@@ -60,7 +60,7 @@ do
 		if who == CONSOLE then
 			text = string_gsub(text, stripcolor, "")
 			if conmsg then conmsg(text) end
-			return print("to " .. CONSOLE .. ": " .. text)
+			return minetest.log("action", "to " .. CONSOLE .. ": " .. text)
 		else
 			return old_chatsend(who, text, ...)
 		end
@@ -95,7 +95,7 @@ assert(master:listen())
 
 -- Helper function to log console debugging information.
 local function clientlog(client, str)
-	print(modname .. "[" .. client.id .. "]: " .. str)
+	minetest.log("action", modname .. "[" .. client.id .. "]: " .. str)
 end
 
 -- Attempt to accept a new client connection.
@@ -116,7 +116,7 @@ local function accept()
 		clientlog(c, "connected")
 		c.sock:send("connected as " .. id .. "\n> ")
 	elseif err ~= "timeout" then
-		print(CONSOLE .. " accept(): " .. err)
+		minetest.log("warning", CONSOLE .. " accept(): " .. err)
 	end
 end
 

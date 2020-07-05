@@ -26,7 +26,7 @@ local function savedb()
 		local newlist
 		for toname, data in pairs(tolist) do
 			if (not data.exp) or (data.exp < now) then
-				minetest.log("invite expired: " .. minetest.serialize({
+				minetest.log("action", "invite expired: " .. minetest.serialize({
 							from = fromname,
 							to = toname,
 							data = data,

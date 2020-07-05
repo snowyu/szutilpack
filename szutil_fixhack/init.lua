@@ -159,7 +159,7 @@ minetest.register_globalstep(function(dtime)
 local function reportstats()
 	if totaltime == 0 then return end
 	local function ms(i) return math_floor(i * 1000000) / 1000 end
-	minetest.log(modname .. ": processed " .. totalqty .. " mapblocks using "
+	minetest.log("action", modname .. ": processed " .. totalqty .. " mapblocks using "
 		.. ms(proctime) .. "ms out of " .. ms(totaltime) .. "ms ("
 		.. (math_floor(proctime / totaltime * 10000) / 100)
 		.. "%), " .. ms(availtime) .. "ms saved")

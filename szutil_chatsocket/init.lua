@@ -54,7 +54,7 @@ assert(master:listen())
 
 -- Helper function to log console debugging information.
 local function clientlog(client, str)
-	minetest.log(modname .. "[" .. client.id .. "]: " .. str)
+	minetest.log("action", modname .. "[" .. client.id .. "]: " .. str)
 end
 
 -- Attempt to accept a new client connection.
@@ -74,7 +74,7 @@ local function accept()
 
 		clientlog(c, "connected")
 	elseif err ~= "timeout" then
-		minetest.log(modname .. " accept(): " .. err)
+		minetest.log("warning", modname .. " accept(): " .. err)
 	end
 end
 
