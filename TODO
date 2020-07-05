@@ -3,9 +3,6 @@
 - Need to change how con/chat socket mods access luasockets?
   https://github.com/minetest/minetest/pull/9943
 
-- MOTD mod should background-poll the MOTD file, and announce if there
-  is an update.  Send a chat message?  Set a HUD?
-
 - szutil_watch needs to save player inventory, watch for race
   conditions.
 
