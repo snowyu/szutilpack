@@ -8,4 +8,8 @@
 
 - szutil_watch crash on 5.3+ ... corrupted metadata?
 
+- Easy teleport module:
+	- Add player search and disambiguation to teleport command.
+	- Add an optional short alias.
+
 ------------------------------------------------------------------------

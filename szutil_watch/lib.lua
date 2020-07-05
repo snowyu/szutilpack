@@ -31,6 +31,7 @@ local function watchdata_get(player, pname)
 	c = player:get_meta():get_string(modname)
 	if (not c) or (c == "") then return end
 	c = minetest.deserialize(c)
+	if type(c) ~= "table" or not pairs(c)(c) then return end
 	watchdata_cache[pname] = c
 	return c
 end
