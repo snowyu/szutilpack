@@ -1,0 +1,20 @@
+------------------------------------------------------------------------
+
+This mod adds a /givemenu command that provides menu-driven access to
+the /give[me] commands.
+
+Use the command:
+	/givemenu [optional search]
+to bring up the menu.
+
+In the search box, you can type in keywords.  The entire description
+AND technical name is searched (case-insensitive) for each keyword you
+enter and all must match.
+
+At the bottom, you can choose to whom to give the item (default is
+yourself).
+
+Double-click an item to give it.  Use Esc or your "inventory" keybind
+to close the menu.
+
+------------------------------------------------------------------------
