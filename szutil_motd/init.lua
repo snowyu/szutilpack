@@ -1,14 +1,18 @@
 -- LUALOCALS < ---------------------------------------------------------
 local io, minetest, string, tonumber
     = io, minetest, string, tonumber
-local io_close, io_open, string_match
-    = io.close, io.open, string.match
+local io_close, io_open, string_gsub, string_match, string_sub
+    = io.close, io.open, string.gsub, string.match, string.sub
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
 local modstore = minetest.get_mod_storage()
 
--- Path to the extended motd file, stored in the world path.
+local phashkey = minetest.settings:get("szutil_motd_hashkey") or ""
+local function phash(pname)
+	if #phashkey < 1 then return "0000" end
+	return string_sub(minetest.sha1(phashkey .. pname .. phashkey .. pname), 1, 4)
+end
 
 -- Function to read current MOTD
 local readmotd
@@ -71,7 +75,7 @@ local function sendmotd(name, force)
 	minetest.show_formspec(name, modname,
 		"size[" .. fsw .. "," .. fsh .. ",true]"
 		.. "textarea[0.3,0;" .. fsw .. "," .. fsh .. ";;;"
-		.. minetest.formspec_escape(motd)
+		.. minetest.formspec_escape(string_gsub(motd, "<phash>", phash(name)))
 		.. "]button_exit[0," .. (fsh - 0.75) .. ";" .. fsw
 		.. ",1;ok;" .. (minetest.settings:get(modname
 				.. "_button") or "Continue") .. "]")

@@ -1,8 +1,8 @@
 -- LUALOCALS < ---------------------------------------------------------
 local math, minetest, pairs, string, type
     = math, minetest, pairs, string, type
-local math_random, string_format
-    = math.random, string.format
+local math_random, string_format, string_gsub, string_sub
+    = math.random, string.format, string.gsub, string.sub
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -32,6 +32,15 @@ or ("You have already agreed and privileges were"
 
 local notice = conf("get", "notice") or ("*** %s agreed to " .. motddesc)
 
+local phashkey = minetest.settings:get("szutil_motd_hashkey") or ""
+local function phash(pname)
+	if #phashkey < 1 then return "0000" end
+	return string_sub(minetest.sha1(phashkey .. pname .. phashkey .. pname), 1, 4)
+end
+local function phsub(line, pname)
+	return string_gsub(line, "<phash>", phash(pname))
+end
+
 local huds = {}
 local function hudcheck(pname)
 	pname = type(pname) == "string" and pname or pname:get_player_name()
@@ -60,7 +69,7 @@ local function hudcheck(pname)
 			phud[1] = phud[1] or player:hud_add({
 					hud_elem_type = "text",
 					position = {x = 0.5, y = 0.5},
-					text = hudline1,
+					text = phsub(hudline1, pname),
 					number = 0xFFC000,
 					alignment = {x = 0, y = -1},
 					offset = {x = 0, y = -1}
@@ -68,7 +77,7 @@ local function hudcheck(pname)
 			phud[2] = phud[2] or player:hud_add({
 					hud_elem_type = "text",
 					position = {x = 0.5, y = 0.5},
-					text = hudline2,
+					text = phsub(hudline2, pname),
 					number = 0xFFC000,
 					alignment = {x = 0, y = 1},
 					offset = {x = 0, y = 1}
@@ -91,7 +100,7 @@ minetest.register_privilege(modname, {
 minetest.register_chatcommand(cmdname, {
 		description = cmdinstruct,
 		func = function(pname, param)
-			if param ~= cmdparam then return false, cmdinstruct end
+			if param ~= phsub(cmdparam, pname) then return false, cmdinstruct end
 			if minetest.check_player_privs(pname, modname) then
 				return false, already
 			end
