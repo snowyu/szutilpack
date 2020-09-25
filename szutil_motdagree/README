@@ -21,6 +21,11 @@ Optionally, by setting szutil_motdagree_purge to true, users who log off
 without agreeing to the terms will be purged from the system and need
 to re-register each time until they agree to the terms.
 
+The "lobby" is limited to only a few players at a time, and new players
+beyond this will be rejected, while players that have already agreed to
+the terms bypass this limit.  There is both a soft and hard limit
+between which the probability of being rejected slides from 0% to 100%.
+
 Moderators (who have the ban priv) can enable/disable new registrations
 using the /szutil_motdagree command.  When registration is closed,
 players can enter the "lobby" but cannot agree to the terms until

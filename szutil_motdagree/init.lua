@@ -1,8 +1,10 @@
 -- LUALOCALS < ---------------------------------------------------------
-local math, minetest, pairs, string, type
-    = math, minetest, pairs, string, type
-local math_random, string_format, string_gsub, string_lower, string_sub
-    = math.random, string.format, string.gsub, string.lower, string.sub
+local error, math, minetest, pairs, string, type
+    = error, math, minetest, pairs, string, type
+local math_ceil, math_random, string_format, string_gsub, string_lower,
+      string_sub
+    = math.ceil, math.random, string.format, string.gsub, string.lower,
+      string.sub
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -15,6 +17,12 @@ local function conf(k, n)
 end
 
 local motddesc = conf("get", "desc") or "terms"
+
+local limitsoft = conf("get", "limitsoft") or 3
+local limithard = conf("get", "limithard") or math_ceil(limitsoft * 1.5)
+if limithard < limitsoft then error("hard limit cannot be less than soft limit") end
+local limitmsg = conf("get", "limitmsg") or "There are too many new players"
+.. " right now; please try again in a few minutes."
 
 local cmdname = conf("get", "cmdname") or "agree"
 local cmdparam = conf("get", "cmdparam") or ("to " .. motddesc)
@@ -48,6 +56,25 @@ local function phash(pname)
 end
 local function phsub(line, pname)
 	return string_gsub(line, "<phash>", phash(pname))
+end
+
+if limitsoft >= 0 and limithard > 0 then
+	local emerging = {}
+	minetest.register_on_prejoinplayer(function(name)
+			if minetest.check_player_privs(name, modname) then return end
+			local lobby = 0
+			for _, p in pairs(minetest.get_connected_players()) do
+				local pname = p:get_player_name()
+				emerging[pname] = nil
+				if not minetest.check_player_privs(p:get_player_name(), modname)
+				then lobby = lobby + 1 end
+			end
+			for _, t in pairs(emerging) do
+				if t + 60 < minetest.get_us_time() then lobby = lobby + 1 end
+			end
+			if lobby > math_random(limitsoft, limithard) then return limitmsg end
+			emerging[name] = minetest.get_us_time() / 1000000
+		end)
 end
 
 local huds = {}
