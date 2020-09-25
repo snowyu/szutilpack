@@ -72,20 +72,20 @@ minetest.register_globalstep(function(dtime)
 		end
 	end)
 
-local hooked
-local function chathook()
-	if minetest.chat_send_all == hooked then return end
-	local oldsend = minetest.chat_send_all
-	hooked = function(msg, ...)
-		local pname = string_match(msg, "^%*%*%* (%S+) joined the game")
-		or string_match(msg, "^%*%*%* (%S+) left the game")
-		if pname and isstealth(pname) then return end
-		return oldsend(msg, ...)
-	end
-	minetest.chat_send_all = hooked
-	minetest.after(0, chathook)
-end
-chathook()
+minetest.after(0, function()
+		local oldjoin = minetest.send_join_message
+		function minetest.send_join_message(pname, ...)
+			if not minetest.check_player_privs(pname, "stealth") then
+				return oldjoin(pname, ...)
+			end
+		end
+		local oldleave = minetest.send_leave_message
+		function minetest.send_leave_message(pname, ...)
+			if not minetest.check_player_privs(pname, "stealth") then
+				return oldleave(pname, ...)
+			end
+		end
+	end)
 
 local function stripstatus(msg, ...)
 	local pref, clients, suff = string_match(msg, "^(.*)clients={([^}]*)}(.*)$")
