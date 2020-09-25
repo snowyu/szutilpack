@@ -39,30 +39,14 @@ end
 
 local function everyone(func)
 	for _, p in ipairs(minetest.get_connected_players()) do
-		func(p)
+		local props = p:get_properties()
+		if props.visual_size and props.visual_size.x > 0
+		and props.visual_size.y > 0 then func(p) end
 	end
-end
-
-local function handlewatchall(p)
-	if not (lib.dataget(p) or {}).watchall then return end
-	local pn = p:get_player_name()
-	local n = p:get_wield_index()
-	everyone(function(q)
-			local qn = q:get_player_name()
-			if qn ~= pn then
-				n = n - 1
-				if n == 0 then
-					lib.start(p, q)
-				else
-					lib.stop(p, q)
-				end
-			end
-		end)
 end
 
 minetest.register_globalstep(function(dt)
 		everyone(function(p)
-				handlewatchall(p)
 				lib.restore(dt, p)
 				if p:get_armor_groups().immortal then
 					p:set_breath(11)
@@ -95,21 +79,8 @@ minetest.register_chatcommand("unwatch", {
 			local player = minetest.get_player_by_name(p)
 			if player then
 				local data = lib.dataget(player) or {}
-				data.watchall = nil
 				lib.dataset(player, data)
 			end
 			return lib.stop(p, ...)
-		end
-	})
-
-minetest.register_chatcommand("watchall", {
-		description = "cycle watching all players",
-		privs = {watch = true},
-		func = function(name)
-			local player = minetest.get_player_by_name(name)
-			if not player then return end
-			local data = lib.dataget(player) or {}
-			data.watchall = true
-			lib.dataset(player, data)
 		end
 	})

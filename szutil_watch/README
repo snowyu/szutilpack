@@ -4,8 +4,6 @@ This mod adds a "spectator mode."  Players with the "watch" privilege
 can use:
 
 - the "/watch <player>" command, to watch another player.
-- the "/watchall" command, to watch an arbitrarily selected set of
-  players (up to the number of hotbar slots) by using hotbar switching.
 - the "/unwatch" command to return to normal play.
 
 ------------------------------------------------------------------------

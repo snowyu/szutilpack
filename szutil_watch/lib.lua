@@ -16,6 +16,14 @@ local function playerize(param)
 	return param, param:get_player_name()
 end
 
+local function vischeck(player, ...)
+	if not player then return end
+	local props = player:get_properties()
+	if not (props and props.visual_size and props.visual_size.x > 0
+		and props.visual_size.y > 0) then return end
+	return player, ...
+end
+
 local function setprivs(pname, setfunc)
 	local privs = minetest.get_player_privs(pname)
 	local r = setfunc(privs)
@@ -126,7 +134,7 @@ end
 local function watch_start(wparam, tparam)
 	local wplayer, wname = playerize(wparam)
 	if not wplayer then return false, "watcher not found" end
-	local tplayer, tname = playerize(tparam)
+	local tplayer, tname = vischeck(playerize(tparam))
 	if not tplayer then return false, "target not found" end
 	if wname == tname then return watch_stop(wparam) end
 
