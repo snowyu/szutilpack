@@ -49,6 +49,8 @@ local notice = conf("get", "notice") or ("*** %s agreed to " .. motddesc)
 local noticeclosed = conf("get", "noticeclosed") or (notice
 	.. " ... but registration currently is closed")
 
+local jointag = conf("get", "jointag") or " [new]"
+
 local phashkey = minetest.settings:get("szutil_motd_hashkey") or ""
 local function phash(pname)
 	if #phashkey < 1 then return "0000" end
@@ -56,6 +58,25 @@ local function phash(pname)
 end
 local function phsub(line, pname)
 	return string_gsub(line, "<phash>", phash(pname))
+end
+
+if jointag and jointag ~= "" then
+	local oldmsg = minetest.send_join_message
+	function minetest.send_join_message(pname, ...)
+		if minetest.check_player_privs(pname, modname) then
+			return oldmsg(pname, ...)
+		end
+		local oldsend = minetest.chat_send_all
+		function minetest.chat_send_all(text, ...)
+			minetest.chat_send_all = oldsend
+			return oldsend(text .. jointag, ...)
+		end
+		local function helper(...)
+			minetest.chat_send_all = oldsend
+			return ...
+		end
+		return helper(oldmsg(pname, ...))
+	end
 end
 
 if limitsoft >= 0 and limithard > 0 then
