@@ -21,4 +21,9 @@ Optionally, by setting szutil_motdagree_purge to true, users who log off
 without agreeing to the terms will be purged from the system and need
 to re-register each time until they agree to the terms.
 
+Moderators (who have the ban priv) can enable/disable new registrations
+using the /szutil_motdagree command.  When registration is closed,
+players can enter the "lobby" but cannot agree to the terms until
+registration is opened again.
+
 ------------------------------------------------------------------------
