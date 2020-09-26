@@ -13,7 +13,6 @@ local function handlehud(player)
 	local data = lib.dataget(player) or {}
 	local text = ""
 	if data.target then text = "Watching: " .. data.target end
-	if data.watchall then text = text .. "\n(Hotkey Cycling)" end
 	local pname = player:get_player_name()
 	local tip = huds[pname]
 	if tip then
@@ -39,9 +38,7 @@ end
 
 local function everyone(func)
 	for _, p in ipairs(minetest.get_connected_players()) do
-		local props = p:get_properties()
-		if props.visual_size and props.visual_size.x > 0
-		and props.visual_size.y > 0 then func(p) end
+		func(p)
 	end
 end
 
