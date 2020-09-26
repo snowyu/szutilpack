@@ -6,6 +6,12 @@ local minetest, pairs, rawset, type
 local modname = minetest.get_current_modname()
 local vzero = vector.new()
 
+local function everyone(func)
+	for _, p in ipairs(minetest.get_connected_players()) do
+		func(p)
+	end
+end
+
 local function playerize(param)
 	if (not param) or (param == "") then return end
 	if type(param) == "string" then
@@ -138,6 +144,8 @@ local function watch_start(wparam, tparam)
 	if not tplayer then return false, "target not found" end
 	if wname == tname then return watch_stop(wparam) end
 
+	everyone(function(p) watch_stop(p, wplayer) end)
+
 	local data = watchdata_get(wplayer, wname) or {}
 	if data.target == tname then return end
 	data.saved = data.saved or data.restore
@@ -191,5 +199,6 @@ rawset(_G, modname, {
 		damage = watch_damage,
 		restore = watch_restore,
 		stop = watch_stop,
-		start = watch_start
+		start = watch_start,
+		everyone = everyone
 	})

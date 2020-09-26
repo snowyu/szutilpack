@@ -36,14 +36,8 @@ local function handlehud(player)
 	}
 end
 
-local function everyone(func)
-	for _, p in ipairs(minetest.get_connected_players()) do
-		func(p)
-	end
-end
-
 minetest.register_globalstep(function(dt)
-		everyone(function(p)
+		lib.everyone(function(p)
 				lib.restore(dt, p)
 				if p:get_armor_groups().immortal then
 					p:set_breath(11)
@@ -58,7 +52,7 @@ minetest.register_on_joinplayer(function(player)
 
 minetest.register_on_leaveplayer(function(player)
 		lib.stop(player)
-		everyone(function(p) lib.stop(p, player) end)
+		lib.everyone(function(p) lib.stop(p, player) end)
 		huds[player:get_player_name()] = nil
 	end)
 
