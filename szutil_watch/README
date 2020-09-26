@@ -1,9 +1,20 @@
 ------------------------------------------------------------------------
 
-This mod adds a "spectator mode."  Players with the "watch" privilege
-can use:
+This mod adds a "spectator mode."
 
 - the "/watch <player>" command, to watch another player.
 - the "/unwatch" command to return to normal play.
+- the "/watchshare <list>" command sets a list of players allowed to
+  watch a player without the "watch" privilege.
+
+Players who have the "watch" privilege can always watch any other player
+who isn't already watching another player or otherwise invisible.
+
+Using the watchshare command allows a player to share their play
+experience with other players (effectively in-game "streaming").  The
+parameter is a whitelist of exact player names, or "*" to allow any
+player.  The list is cleared automatically when the player logs out;
+to reshare after rejoining, the command needs to be used again (this
+is a safeguard against accidentally leaving it open).
 
 ------------------------------------------------------------------------

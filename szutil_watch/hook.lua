@@ -6,7 +6,7 @@ local ipairs, minetest
 local modname = minetest.get_current_modname()
 local lib = _G[modname]
 
-minetest.register_privilege("watch", "Player can watch other players")
+minetest.register_privilege("watch", "Player can watch all other players")
 
 local huds = {}
 local function handlehud(player)
@@ -36,6 +36,13 @@ local function handlehud(player)
 	}
 end
 
+local watchshare = {}
+local function canwatch(wname, tnname)
+	if minetest.check_player_privs(wname, "watch") then return true end
+	local share = watchshare[tnname]
+	return share and (share[wname] or share['*'])
+end
+
 minetest.register_globalstep(function(dt)
 		lib.everyone(function(p)
 				lib.restore(dt, p)
@@ -51,6 +58,7 @@ minetest.register_on_joinplayer(function(player)
 	end)
 
 minetest.register_on_leaveplayer(function(player)
+		watchshare[player:get_player_name()] = nil
 		lib.stop(player)
 		lib.everyone(function(p) lib.stop(p, player) end)
 		huds[player:get_player_name()] = nil
@@ -59,19 +67,30 @@ minetest.register_on_leaveplayer(function(player)
 minetest.register_chatcommand("watch", {
 		params = "<to_name>",
 		description = "watch a given player",
-		privs = {watch = true},
-		func = lib.start
+		func = function(name, param)
+			return lib.start(name, param, canwatch)
+		end
 	})
 
 minetest.register_chatcommand("unwatch", {
 		description = "unwatch a player",
-		privs = {watch = true},
-		func = function(p, ...)
-			local player = minetest.get_player_by_name(p)
-			if player then
-				local data = lib.dataget(player) or {}
-				lib.dataset(player, data)
+		func = lib.stop
+	})
+
+minetest.register_chatcommand("watchshare", {
+		params = "[...<name|*>]",
+		description = "set the list of players who can watch you",
+		func = function(name, param)
+			local share = {}
+			for _, p in ipairs(param:split(' ')) do
+				share[p] = true
 			end
-			return lib.stop(p, ...)
+			watchshare[name] = share
+			lib.everyone(function(p)
+					if not canwatch(p:get_player_name(), name) then
+						lib.stop(p, name)
+					end
+				end)
+			return true, "Allowed watchers: " .. param
 		end
 	})

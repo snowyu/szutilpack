@@ -1,6 +1,6 @@
 -- LUALOCALS < ---------------------------------------------------------
-local minetest, pairs, rawset, type
-    = minetest, pairs, rawset, type
+local ipairs, minetest, pairs, rawset, type
+    = ipairs, minetest, pairs, rawset, type
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -137,12 +137,16 @@ local function watch_stop(wparam, tparam)
 	return true
 end
 
-local function watch_start(wparam, tparam)
+local function watch_start(wparam, tparam, check)
 	local wplayer, wname = playerize(wparam)
 	if not wplayer then return false, "watcher not found" end
 	local tplayer, tname = vischeck(playerize(tparam))
-	if not tplayer then return false, "target not found" end
+	if not tplayer then return false, "target not found or not allowed" end
 	if wname == tname then return watch_stop(wparam) end
+
+	if check and not check(wname, tname, wplayer, tplayer) then
+		return false, "target not found or not allowed"
+	end
 
 	everyone(function(p) watch_stop(p, wplayer) end)
 
