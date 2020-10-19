@@ -17,4 +17,7 @@ yourself).
 Double-click an item to give it.  Use Esc or your "inventory" keybind
 to close the menu.
 
+The /gm command is a shortcut to /givemenu, as long as no other mod
+registers a /gm command at load-time.
+
 ------------------------------------------------------------------------

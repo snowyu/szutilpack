@@ -62,7 +62,8 @@ local function givemenu(pname, search)
 	table_sort(names, sortci)
 	local idx = 0
 	for i = 1, #names do if names[i] == minetest.formspec_escape(pname) then idx = i end end
-	form = form .. "dropdown[0,7.5;12;whom;" .. table_concat(names, ",") .. ";" .. idx .. "]"
+	form = form .. "dropdown[0,7.5;12;whom;" .. table_concat(names, ",") .. ";" .. idx
+	.. "]field_close_on_enter[search;false]"
 
 	shown[pname] = lookup
 	return minetest.show_formspec(pname, modname, form)
@@ -93,4 +94,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 						def.stack_max
 					}, " "))
 		end
+	end)
+
+minetest.after(0, function()
+		minetest.registered_chatcommands.gm = minetest.registered_chatcommands.gm or
+		minetest.registered_chatcommands.givemenu
 	end)
