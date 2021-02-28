@@ -1,0 +1,16 @@
+{
+	"user": "Warr1024",
+	"type": "mod",
+	"title":"SzUtilPack",
+	"short_description": "A collection of misc dependency-free utilities primarily for server hosts.",
+	"tags": ["environment",
+		"library",
+		"world_tools",
+		"player_effects",
+		"server_tools",
+		"transport"
+	],
+	"license": "MIT",
+	"media_license": "MIT",
+	"repo": "https://gitlab.com/sztest/szutilpack"
+}

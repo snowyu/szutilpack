@@ -1,1 +1,4 @@
 .cdbrelease.lua export-subst
+.cdbscreen.png export-ignore
+.cdb.json export-ignore
+.cdbdesc.md export-ignore
