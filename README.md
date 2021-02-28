@@ -1,4 +1,6 @@
-A pack of independent utilities, including:
+A collection of miscellaneous mods for minetest providing "utility" functonality: management features, bug workarounds, and libraries for other mods.  Each mod includes an individual README file with details on its use.
+
+Each mod in the pack is effectively independent, with minimal or no dependencies (including on any assumed underlying game) and they can be enabled/disabled individually.  Mods are distributed as a single pack because they have a single shared maintenance/release cycle.
 
 - `szutil_chatsocket`: Expose in-game chat stream as a unix-domain socket for arbitrary chat integrations.
 - `szutil_chatsounds`: Configurable beep notifications for in-game chat.
@@ -20,5 +22,3 @@ A pack of independent utilities, including:
 - `szutil_telecode`: Teleportation by opaque codes that can be shared, saved, and published.
 - `szutil_usagesurvey`: Collect usage statistics per-mapblock on how each is being used (e.g. for pruning lightly-used portions of the map).
 - `szutil_watch`: Allow privileged players to attach to and spectate other players.
-
-Each mod in the pack is effectively independent, and they can be enabled/disabled individually.  Mods are distributed as a single pack because they have a single shared maintenance/release cycle.

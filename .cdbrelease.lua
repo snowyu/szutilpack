@@ -1,14 +1,7 @@
 -- LUALOCALS < ---------------------------------------------------------
-local math, tonumber
-    = math, tonumber
-local math_floor
-    = math.floor
+local dofile
+    = dofile
 -- LUALOCALS > ---------------------------------------------------------
-
-local stamp = tonumber("$Format:%at$")
-if not stamp then return end
-stamp = math_floor((stamp - 1540612800) / 60)
-stamp = ("00000000" .. stamp):sub(-8)
 
 -- luacheck: push
 -- luacheck: globals config readtext readbinary
@@ -17,12 +10,26 @@ readtext = readtext or function() end
 readbinary = readbinary or function() end
 
 return {
-	user = "Warr1024",
 	pkg = "szutilpack",
-	min = "5.0",
-	version = stamp .. "-$Format:%h$",
-	long_description = readtext(".cdbdesc.md"),
-	screenshots = {readbinary(".cdbscreen.png")}
+	version = dofile("./version.lua"),
+	type = "mod",
+	title = "SzUtilPack",
+	short_description = "A collection of misc dependency-free utilities primarily for server hosts.",
+	tags = {
+		"environment",
+		"library",
+		"world_tools",
+		"player_effects",
+		"server_tools",
+		"transport"
+	},
+	content_warnings = {},
+	license = "MIT",
+	media_license = "MIT",
+	long_description = readtext('README.md'),
+	repo = "https://gitlab.com/sztest/szutilpack",
+	maintainers = {"Warr1024"},
+	screenshots = {readbinary('.cdbscreen.png')}
 }
 
 -- luacheck: pop
