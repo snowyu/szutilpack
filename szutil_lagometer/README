@@ -1,14 +1,21 @@
 ------------------------------------------------------------------------
 
-Display a simple HUD meter showing an estimate of current server "lag,"
-i.e. the size of "steps" the server is running.  This allows admins to
-monitor system performance, or mod authors to monitor code performance
-impact, continuously, instead of having to do /status over and over.
+Display a full near-realtime analysis of server "lag", i.e. globalstep
+dtimes.  This allows admins to monitor system performance, or mod
+authors to monitor code performance impact, continuously, instead of
+having to do /status over and over.
 
-The lag calculation is done indepdendently of /status's max_lag, and
-some parameters can be tuned.  See init.lua for configuration details.
+The visualization is a weighted histogram, where time is sorted into
+buckets by step size, and each bucket contains the total amount of time
+spent performing steps of that size.  The number on the right is the
+step size (max) for that bucket, the number on the left is the total
+time in that bucket, and the bar graph visually approximates (up to a
+limit) the time value.  Instead of just an average, this visualization
+shows distribution of step sizes, making it possible to identify
+specific types of spikes.
 
-Players will see the lagometer iff they have the "lagometer" priv.
-The meter displays just above the health bar.
+Players will see the lagometer if they have the "lagometer" priv, and
+enable the lagometer toggle via the /lagometer command.  The meter
+displays on the bottom right of the screen.
 
 ------------------------------------------------------------------------

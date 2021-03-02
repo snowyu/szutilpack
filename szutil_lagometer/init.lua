@@ -1,33 +1,83 @@
 -- LUALOCALS < ---------------------------------------------------------
-local ipairs, minetest, string, tonumber
-    = ipairs, minetest, string, tonumber
-local string_format
-    = string.format
+local ipairs, loadstring, math, minetest, pairs, string, tonumber
+    = ipairs, loadstring, math, minetest, pairs, string, tonumber
+local math_ceil, math_floor, string_format, string_rep, string_sub
+    = math.ceil, math.floor, string.format, string.rep, string.sub
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
 
+------------------------------------------------------------------------
+-- SETTINGS
+
+local function getconf(suff)
+	return tonumber(minetest.settings:get(modname .. "_" .. suff))
+end
+
 -- How often to publish updates to players. Too infrequent and the meter
--- is no longer as "real-time", but too frequent and they'll get bombarded
--- with HUD change packets.
-local interval = tonumber(minetest.settings:get(modname .. "_interval")) or 2
+-- is no longer as "real-time", but too frequent and they'll get
+-- bombarded with HUD change packets.
+local interval = getconf("interval") or 2
 
--- The "fall-off ratio" to multiply the previous lag values by each tick.
--- Lag spikes will set the lag estimate high, and multiplying by this fall-off
--- ratio is the only way it will fall back down.
-local falloff = tonumber(minetest.settings:get(modname .. "_falloff")) or 0.99
+-- The amount of time in each measurement period. This is also the
+-- amount of time between each period expiration.
+local period_length = getconf("period_length") or 5
 
--- Keep track of our estimate of server lag.
-local lag = 0
+-- The number of time periods across which to accumualate statistics.
+local period_count = getconf("period_count") or 12
 
--- Keep track of connected players and their meters.
-local meters = {}
+-- Size of buckets into which dtime values are sorted in weighted
+-- histogram.
+local bucket_step = getconf("bucket_step") or 0.05
+
+-- Maximum number of buckets. All step times too large for any other
+-- bucket will go into the highest bucket.
+local bucket_max = getconf("bucket_max") or 20
+
+-- Constructor function to pre-initialize a new period table.
+local newperiod = loadstring("return {" .. string_rep("0,", bucket_max) .. "}")
+
+------------------------------------------------------------------------
+-- MEASUREMENT
+
+-- Queue of accounting periods.
+local periods = {}
+
+-- Precise game runtime clock.
+local clock = 0
+
+-- Collect statistics at each step.
+minetest.register_globalstep(function(dtime)
+		-- Update clock.
+		clock = clock + dtime
+
+		-- Find current accounting period, initialize
+		-- if not already present.
+		local key = math_floor(clock / period_length)
+		local cur = periods[key]
+		if not cur then
+			cur = newperiod()
+			periods[key] = cur
+		end
+
+		-- Find correct histogram bucket.
+		local bucket = math_floor(dtime / bucket_step)
+		if bucket > bucket_max then bucket = bucket_max
+		elseif bucket < 1 then bucket = 1 end
+
+		-- Add weight to bucket.
+		cur[bucket] = cur[bucket] + dtime
+	end)
+
+------------------------------------------------------------------------
+-- USER TOGGLE
 
 -- Create a separate privilege for players to see the lagometer. This
 -- feature is too "internal" to show to all players unconditionally,
 -- but not so "internal" that it should depend on the "server" priv.
 minetest.register_privilege("lagometer", "Can see the lagometer")
 
+-- Command to manually toggle the lagometer.
 minetest.register_chatcommand("lagometer", {
 		description = "Toggle the lagometer",
 		privs = {lagometer = true},
@@ -42,52 +92,82 @@ minetest.register_chatcommand("lagometer", {
 		end,
 	})
 
+------------------------------------------------------------------------
+-- REPORTING
+
+-- Keep track of connected players and their meters.
+local meters = {}
+
+-- Pre-allocated bar graph.
+local graphbar = string_rep("|", 40)
+
 -- Function to publish current lag values to all receiving parties.
 local function publish()
-	-- Format the lag string with the raw numerical value, and
-	-- a cheapo ASCII "bar graph" to provide a better visual cue
-	-- for its general magnitude.
-	local t = string_format("Server Lag: %2.2f ", lag)
-	local q = lag * 10 + 0.5
-	if q > 40 then q = 40 end
-	for _ = 1, q, 1 do t = t .. "|" end
+	-- Expire old periods, and accumulate current ones.
+	local accum = newperiod()
+	do
+		local curkey = math_floor(clock / period_length)
+		for pk, pv in pairs(periods) do
+			if pk <= curkey - period_count then
+				periods[pk] = nil
+			else
+				for ik, iv in ipairs(pv) do
+					accum[ik] = accum[ik] + iv
+				end
+			end
+		end
+	end
 
-	-- Apply the appropriate text to each meter.
-	for _, p in ipairs(minetest.get_connected_players()) do
-		local n = p:get_player_name()
-		local v = meters[n]
+	-- Construct the weighted historgram visualization.
+	for bucket = 1, bucket_max do
+		local qty = accum[bucket]
 
-		-- Players with privilege will see the meter, players without
-		-- will get an empty string. The meters are always left in place
-		-- rather than added/removed for simplicity, and to make it easier
-		-- to handle when the priv is granted/revoked while the player
-		-- is connected.
-		local s = ""
-		if minetest.get_player_privs(n).lagometer
-		and (p:get_meta():get_string("lagometer") or "") ~= ""
-		then s = t end
+		local line = qty <= 0 and "" or string_format(" % 2.2f % s % 2.2f % s", qty,
+			string_sub(graphbar, 1, math_ceil(qty * 2)),
+			bucket * bucket_step,
+			string_rep("\n", bucket - 1))
 
-		-- Only apply the text if it's changed, to minimize the risk of
-		-- generating useless unnecessary packets.
-		if s ~= "" and not v then
-			meters[n] = {
-				text = s,
-				hud = p:hud_add({
-						hud_elem_type = "text",
-						position = {x = 0.5, y = 1},
-						text = s,
-						alignment = {x = 1, y = -1},
-						number = 0xC0C0C0,
-						scale = {x = 1280, y = 20},
-						offset = {x = -262, y = -88}
-					})
-			}
-		elseif v and s == "" then
-			p:hud_remove(v.hud)
-			meters[n] = nil
-		elseif v and v.text ~= s then
-			p:hud_change(v.hud, "text", s)
-			v.text = s
+		-- Apply the appropriate text to each meter.
+		for _, player in ipairs(minetest.get_connected_players()) do
+			local pname = player:get_player_name()
+			local meter = meters[pname]
+			if not meter then
+				meter = {}
+				meters[pname] = meter
+			end
+			local mline = meter[bucket]
+
+			-- Players with privilege will see the meter, players without
+			-- will get an empty string. The meters are always left in place
+			-- rather than added/removed for simplicity, and to make it easier
+			-- to handle when the priv is granted/revoked while the player
+			-- is connected.
+			local text = ""
+			if minetest.get_player_privs(pname).lagometer
+			and (player:get_meta():get_string("lagometer") or "") ~= ""
+			then text = line end
+
+			-- Only apply the text if it's changed, to minimize the risk of
+			-- generating useless unnecessary packets.
+			if text ~= "" and not mline then
+				meter[bucket] = {
+					text = text,
+					hud = player:hud_add({
+							hud_elem_type = "text",
+							position = {x = 1, y = 1},
+							text = text,
+							alignment = {x = -1, y = -1},
+							number = 0xC0C0C0,
+							offset = {x = -4, y = -4}
+						})
+				}
+			elseif mline and text == "" then
+				player:hud_remove(mline.hud)
+				meter[bucket] = nil
+			elseif mline and mline.text ~= text then
+				player:hud_change(mline.hud, "text", text)
+				mline.text = text
+			end
 		end
 	end
 end
@@ -99,17 +179,6 @@ local function update()
 	minetest.after(interval, update)
 end
 minetest.after(0, update)
-
--- Do the lag estimate work in a globalstep. If the lag spikes
--- up, publish immediately; if not, allow the timer to publish as
--- it falls off.
-minetest.register_globalstep(function(dtime)
-		lag = lag * falloff
-		if dtime > lag then
-			lag = dtime
-			publish()
-		end
-	end)
 
 -- Remove meter registrations when players leave.
 minetest.register_on_leaveplayer(function(player)
