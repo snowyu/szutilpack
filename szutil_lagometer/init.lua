@@ -21,10 +21,10 @@ local interval = getconf("interval") or 2
 
 -- The amount of time in each measurement period. This is also the
 -- amount of time between each period expiration.
-local period_length = getconf("period_length") or 5
+local period_length = getconf("period_length") or 2
 
 -- The number of time periods across which to accumualate statistics.
-local period_count = getconf("period_count") or 12
+local period_count = getconf("period_count") or 30
 
 -- Size of buckets into which dtime values are sorted in weighted
 -- histogram.
@@ -33,6 +33,9 @@ local bucket_step = getconf("bucket_step") or 0.05
 -- Maximum number of buckets. All step times too large for any other
 -- bucket will go into the highest bucket.
 local bucket_max = getconf("bucket_max") or 20
+
+-- Maximum number of characters to use for ascii bar graph
+local graphbar_width = getconf("graphbar_width") or 40
 
 -- Constructor function to pre-initialize a new period table.
 local newperiod = loadstring("return {" .. string_rep("0,", bucket_max) .. "}")
@@ -99,7 +102,7 @@ minetest.register_chatcommand("lagometer", {
 local meters = {}
 
 -- Pre-allocated bar graph.
-local graphbar = string_rep("|", 40)
+local graphbar = string_rep("|", graphbar_width)
 
 -- Function to publish current lag values to all receiving parties.
 local function publish()
@@ -123,7 +126,12 @@ local function publish()
 		local qty = accum[bucket]
 
 		local line = qty <= 0 and "" or string_format(" % 2.2f % s % 2.2f % s", qty,
-			string_sub(graphbar, 1, math_ceil(qty * 2)),
+			-- Maximum width of a graph bar corresponds to 50% of the total
+			-- time in the window, so that there will never be 2 bars of the
+			-- same length that don't have the same amount of time, even if
+			-- there is one bar that's longer than all others and is cut off.
+			string_sub(graphbar, 1, math_ceil(qty * 2 * graphbar_width
+					/ period_length / period_count)),
 			bucket * bucket_step,
 			string_rep("\n", bucket - 1))
 
