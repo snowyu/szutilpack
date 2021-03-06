@@ -1,0 +1,7 @@
+------------------------------------------------------------------------
+
+Replacement for the /admin command that lists any members of the server
+moderation team that are online (configurable based on privs), or a
+configurable fallback message if none are in-game.
+
+------------------------------------------------------------------------
