@@ -12,8 +12,11 @@
 	- Add player search and disambiguation to teleport command.
 	- Add an optional short alias.
 
-- Lagometer improvements:
-	- Track more statistics (e.g. quintiles) to show distribution.
-	- Graph/histogram visualization w/ logarithmic buckets?
+- MOTD Agree features
+	- Cooldown upon joining before agreeing is allowed.
+	- Waiting period after agreeing before additional privs added
+	  (maybe as a separate mod, to generically convert one priv
+	  to another upon a certain delay?  Could be used for temporary
+	  revocations too).
 
 ------------------------------------------------------------------------
