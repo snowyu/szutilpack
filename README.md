@@ -17,6 +17,7 @@ Each mod in the pack is effectively independent, with minimal or no dependencies
 - `szutil_nukeplayer`: Adds a /nuke_player command to completely destroy a player account.
 - `szutil_revokeme`: Fixes missing /revokeme admin command.
 - `szutil_roles`: Manage privs via special privs that represent groups of other privs.
+- `szutil_restart`: Externally-triggerable server restarts with countdown/warnings.
 - `szutil_stealth`: Make a player as close to completely invisble to players as possible, for moderation or spectation use.
 - `szutil_suadmin`: Change admin access to be based on a /su (password) command, instead of by player name.
 - `szutil_telecode`: Teleportation by opaque codes that can be shared, saved, and published.

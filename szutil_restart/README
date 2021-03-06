@@ -1,0 +1,13 @@
+------------------------------------------------------------------------
+
+This mod provides a way to gracefully shut down a server from external
+triggers (i.e. scripts) with a graceful countdown to warn players.
+A server restart is triggered by creating a file named "restart" inside
+the world dir.
+
+Note that this only manages shutting down the server from inside; your
+script MUST provide the server restarting, and MUST provide the actual
+restarting capability, and MUST remove the "restart" file before
+starting the server to prevent triggering a restart loop.
+
+------------------------------------------------------------------------
