@@ -40,7 +40,7 @@ local maxuptime = tonumber(conf("maxuptime")) or 86400
 -- Restart shutdown message.
 local shtudownmsg = string_format("\n\n%s\n%s",
 	conf("shutdownmsg1") or "SERVER RESTARTING FOR UPDATES",
-	conf("shutdownmsg2") or "nPlease reconnect in about 10 seconds")
+	conf("shutdownmsg2") or "Please reconnect in about 10 seconds")
 
 -- Message when players are kicked off for restart
 local kickmsg = conf("kickmsg") or "*** Kicking players off for restart"
