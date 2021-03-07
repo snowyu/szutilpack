@@ -1,22 +1,58 @@
 ------------------------------------------------------------------------
 
+- Delayed privileges mod
+	- Countdown modes:
+		- Always-running countdown
+		- Only-while-online countdown
+		- Reset-on-rejoin countdown?
+	- Commands:
+		- Delayed grant
+		- Revoke with delayed restoration
+		- Admin list/cancel/modify delays
+		- Players see their own delays
+	- Privilege delay HUD
+		- Togglable?
+		- Configurable?
+	- Commands need to work with basic_privs/privs access control
+	- Role-like virtual privs that convert to a delay
+		- Use other mods that interact w/ privs
+		- Allow creation waiting period via default_privs, motdagree
+
+- Migrate from dockcore:
+	- my_names
+
+- Basic player stats
+	- Time since join
+	- Last time online
+	- Total time connected
+	- Total time not idle
+	- Actions: chat commands, messages, digs, places, etc.
+	- Could be used for:
+		- Promotion decisions (mark as regular, promote to mod)
+		- Account purge decisions
+	- Handle "grandfathered" players (be aware if mod was not present at player creation)
+		- Record time of recording start.
+	- Look at usagesurvey, old nc_stats mods for ideas.
+
+- /lua mod w/ specific priv
+	- "autoload" code saved in modstorage?
+
+- Add zoom, aux control support to controlhud
+
+- Spectator Mode mod
+	- Temporarily adjust privs: lose interact, gain fly, etc.
+		- noclip, teleport?
+	- Change player visual?
+	- Remember player position, restore upon leaving.
+
+- Reintroduce position tracking HUDs to offlinepos?
+
 - Need to change how con/chat socket mods access luasockets?
   https://github.com/minetest/minetest/pull/9943
+  https://discordapp.com/channels/369122544273588224/369122544273588226/725058830249230388
+  https://discordapp.com/channels/369122544273588224/369122544273588226/725056249917603990
 
-- szutil_watch needs to save player inventory, watch for race
+- BUG?  szutil_watch needs to save player inventory, watch for race
   conditions.
-
-- szutil_watch crash on 5.3+ ... corrupted metadata?
-
-- Easy teleport module:
-	- Add player search and disambiguation to teleport command.
-	- Add an optional short alias.
-
-- MOTD Agree features
-	- Cooldown upon joining before agreeing is allowed.
-	- Waiting period after agreeing before additional privs added
-	  (maybe as a separate mod, to generically convert one priv
-	  to another upon a certain delay?  Could be used for temporary
-	  revocations too).
 
 ------------------------------------------------------------------------
