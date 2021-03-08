@@ -24,7 +24,7 @@ local interval = getconf("interval") or 2
 local period_length = getconf("period_length") or 2
 
 -- The number of time periods across which to accumualate statistics.
-local period_count = getconf("period_count") or 30
+local period_count = getconf("period_count") or 31
 
 -- Size of buckets into which dtime values are sorted in weighted
 -- histogram.
