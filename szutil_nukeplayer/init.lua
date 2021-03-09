@@ -24,7 +24,7 @@ minetest.register_chatcommand("nuke_player", {
 			minetest.remove_player_auth(param)
 			minetest.log("warning", string_format(
 					"player account %q was destroyed by %q",
-					name, param))
+					param, name))
 			return true, string_format("Player %q destroyed", param)
 		end
 	})
