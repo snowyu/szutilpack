@@ -18,6 +18,18 @@
 		- Use other mods that interact w/ privs
 		- Allow creation waiting period via default_privs, motdagree
 
+- Command alias mod
+	- Allow players to register short command aliases
+		- Store in player metadata per-player
+	- Intercept commands ourselves to handler per-player aliases
+		- register_on_chatcommand seems like it can intercept the
+		  command before it's looked up in the global table and
+		  prevent normal lookup.
+	- Make sure we can't alias away our ability to alias/unalias
+	- Inject command back into on_chat callback system
+		- Make sure we can't create infinite alias loops
+		- Allow meta-aliases but only up to a certain depth?
+
 - Migrate from dockcore:
 	- my_names
 
@@ -35,7 +47,6 @@
 	- Look at usagesurvey, old nc_stats mods for ideas.
 
 - /lua mod w/ specific priv
-	- "autoload" code saved in modstorage?
 
 - Add zoom, aux control support to controlhud
 
