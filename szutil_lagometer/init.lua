@@ -1,8 +1,10 @@
 -- LUALOCALS < ---------------------------------------------------------
 local ipairs, loadstring, math, minetest, pairs, string, tonumber
     = ipairs, loadstring, math, minetest, pairs, string, tonumber
-local math_ceil, math_floor, string_format, string_rep, string_sub
-    = math.ceil, math.floor, string.format, string.rep, string.sub
+local math_ceil, math_floor, string_format, string_gsub, string_rep,
+      string_sub
+    = math.ceil, math.floor, string.format, string.gsub, string.rep,
+      string.sub
 -- LUALOCALS > ---------------------------------------------------------
 
 local modname = minetest.get_current_modname()
@@ -80,9 +82,22 @@ minetest.register_globalstep(function(dtime)
 -- but not so "internal" that it should depend on the "server" priv.
 minetest.register_privilege("lagometer", "Can see the lagometer")
 
+local helptext = string_format(string_gsub([[
+		The lagometer is a weighted histogram of the probability distribution of
+		server step times over a sliding window of the past ~%d seconds. The
+		vertical axis is the step time, with labels on the right indicating the
+		upper bound of each bucket. The horizontal axis is the total amount of
+		time that was spent doing steps of that size, with value labels along
+		the left side. Each server step will add its size to the largest bucket
+		that fits it. The largest bucket (%0.2f) also includes all lag spikes
+		too large to fit in any bucket. Old step time is removed from each bucket
+		once it is older than the sliding window size.]], "%s+", " "),
+	period_length * (period_count - 1),
+	bucket_max * bucket_step)
+
 -- Command to manually toggle the lagometer.
 minetest.register_chatcommand("lagometer", {
-		description = "Toggle the lagometer",
+		description = "Toggle the lagometer\n\n" .. helptext,
 		privs = {lagometer = true},
 		func = function(name)
 			local player = minetest.get_player_by_name(name)

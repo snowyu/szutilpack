@@ -5,14 +5,8 @@ dtimes.  This allows admins to monitor system performance, or mod
 authors to monitor code performance impact, continuously, instead of
 having to do /status over and over.
 
-The visualization is a weighted histogram, where time is sorted into
-buckets by step size, and each bucket contains the total amount of time
-spent performing steps of that size.  The number on the right is the
-step size (max) for that bucket, the number on the left is the total
-time in that bucket, and the bar graph visually approximates (up to a
-limit) the time value.  Instead of just an average, this visualization
-shows distribution of step sizes, making it possible to identify
-specific types of spikes.
+The visualization is a weighted histogram.  See the description of the
+lagometer command (i.e. /help lagometer) for more detail.
 
 Players will see the lagometer if they have the "lagometer" priv, and
 enable the lagometer toggle via the /lagometer command.  The meter
