@@ -3,11 +3,16 @@
 This mod provides a way to gracefully shut down a server from external
 triggers (i.e. scripts) with a graceful countdown to warn players.
 A server restart is triggered by creating a file named "restart" inside
-the world dir.
+the world dir, or use of a chatcommand.
 
 Note that this only manages shutting down the server from inside; your
-script MUST provide the server restarting, and MUST provide the actual
-restarting capability, and MUST remove the "restart" file before
-starting the server to prevent triggering a restart loop.
+script MUST provide the actual restarting capability after the server
+exits, and MUST remove the "restart" file before starting the server to
+prevent triggering a restart loop.
+
+If no players are present, then the server will shut down immediately;
+players can all leave the server to skip the countdown.  Silent restarts
+are done quietly if no announcement was originally made, to avoid
+creating noise in chat bridges.
 
 ------------------------------------------------------------------------

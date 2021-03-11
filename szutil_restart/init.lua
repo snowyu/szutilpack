@@ -45,6 +45,9 @@ local shtudownmsg = string_format("\n\n%s\n%s",
 -- Message when players are kicked off for restart
 local kickmsg = conf("kickmsg") or "*** Kicking players off for restart"
 
+-- Message when restarting but there are no players online
+local restartmsg = conf("restartmsg") or "*** Restarting server"
+
 -- Message used to announce pending restart in chat.
 local chatmsg = conf("chatmsg") or "*** Server restart in %s"
 
@@ -130,27 +133,10 @@ do
 end
 
 ------------------------------------------------------------------------
--- Handle actual restart event
-
-do
-	local shuttingdown
-	minetest.register_globalstep(function()
-			if shuttingdown or not req then return end
-			local pcount = #minetest.get_connected_players()
-			if pcount > 0 and remain() > 0 then return end
-			shuttingdown = true
-			if #minetest.get_connected_players() > 0 then
-				minetest.chat_send_all(kickmsg)
-			end
-			return minetest.request_shutdown(shtudownmsg, true)
-		end)
-end
-
-------------------------------------------------------------------------
 -- Announce pending restarts in chat streams
 
+local announced
 do
-	local announced
 	local lastsent
 	minetest.register_globalstep(function()
 			-- Skip if no countdown yet.
@@ -166,6 +152,25 @@ do
 				lastsent = remain()
 				minetest.chat_send_all(string_format(chatmsg, remaintext()))
 			end
+		end)
+end
+
+------------------------------------------------------------------------
+-- Handle actual restart event
+
+do
+	local shuttingdown
+	minetest.register_globalstep(function()
+			if shuttingdown or not req then return end
+			local pcount = #minetest.get_connected_players()
+			if pcount > 0 and remain() > 0 then return end
+			shuttingdown = true
+			if #minetest.get_connected_players() > 0 then
+				minetest.chat_send_all(kickmsg)
+			elseif announced then
+				minetest.chat_send_all(restartmsg)
+			end
+			return minetest.request_shutdown(shtudownmsg, true)
 		end)
 end
 
