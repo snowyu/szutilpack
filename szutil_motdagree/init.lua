@@ -47,9 +47,11 @@ or ("You have already agreed and privileges were"
 
 local notice = conf("get", "notice") or ("*** %s agreed to " .. motddesc)
 local noticeclosed = conf("get", "noticeclosed") or (notice
-	.. " ... but registration currently is closed")
+	.. " ... but registration currently is closed.")
+notice = notice .. "."
 
 local jointag = conf("get", "jointag") or " [new]"
+local purgetag = conf("get", "purgetag") or " [purge]"
 
 local phashkey = minetest.settings:get("szutil_motd_hashkey") or ""
 local function phash(pname)
@@ -60,23 +62,26 @@ local function phsub(line, pname)
 	return string_gsub(line, "<phash>", phash(pname))
 end
 
-if jointag and jointag ~= "" then
-	local oldmsg = minetest.send_join_message
-	function minetest.send_join_message(pname, ...)
+local function tagmsg(func, suff)
+	return function(pname, ...)
 		if minetest.check_player_privs(pname, modname) then
-			return oldmsg(pname, ...)
+			return func(pname, ...)
 		end
 		local oldsend = minetest.chat_send_all
 		function minetest.chat_send_all(text, ...)
 			minetest.chat_send_all = oldsend
-			return oldsend(text .. jointag, ...)
+			return oldsend(text .. suff, ...)
 		end
 		local function helper(...)
 			minetest.chat_send_all = oldsend
 			return ...
 		end
-		return helper(oldmsg(pname, ...))
+		return helper(func(pname, ...))
 	end
+end
+
+if jointag and jointag ~= "" then
+	minetest.send_join_message = tagmsg(minetest.send_join_message, jointag)
 end
 
 if limitsoft >= 0 and limithard > 0 then
@@ -232,4 +237,8 @@ if purge then
 			if minetest.check_player_privs(pname, modname) then return end
 			cache[pname] = true
 		end)
+
+	if purgetag and purgetag ~= "" then
+		minetest.send_leave_message = tagmsg(minetest.send_leave_message, purgetag)
+	end
 end
