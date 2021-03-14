@@ -51,7 +51,7 @@ local noticeclosed = conf("get", "noticeclosed") or (notice
 notice = notice .. "."
 
 local jointag = conf("get", "jointag") or " [new]"
-local purgetag = conf("get", "purgetag") or " [purge]"
+local purgetag = conf("get", "purgetag") or " [gone]"
 
 local phashkey = minetest.settings:get("szutil_motd_hashkey") or ""
 local function phash(pname)
