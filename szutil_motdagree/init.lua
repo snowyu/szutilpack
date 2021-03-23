@@ -97,7 +97,7 @@ if limitsoft >= 0 and limithard > 0 then
 				then lobby = lobby + 1 end
 			end
 			for _, t in pairs(emerging) do
-				if t + 60 < now() then lobby = lobby + 1 end
+				if now() < t + 60 then lobby = lobby + 1 end
 			end
 			if lobby > math_random(limitsoft, limithard) then return limitmsg end
 			emerging[name] = now()
