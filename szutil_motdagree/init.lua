@@ -86,6 +86,7 @@ end
 
 if limitsoft >= 0 and limithard > 0 then
 	local emerging = {}
+	local function now() return minetest.get_us_time() / 1000000 end
 	minetest.register_on_prejoinplayer(function(name)
 			if minetest.check_player_privs(name, modname) then return end
 			local lobby = 0
@@ -96,10 +97,10 @@ if limitsoft >= 0 and limithard > 0 then
 				then lobby = lobby + 1 end
 			end
 			for _, t in pairs(emerging) do
-				if t + 60 < minetest.get_us_time() then lobby = lobby + 1 end
+				if t + 60 < now() then lobby = lobby + 1 end
 			end
 			if lobby > math_random(limitsoft, limithard) then return limitmsg end
-			emerging[name] = minetest.get_us_time() / 1000000
+			emerging[name] = now()
 		end)
 end
 
