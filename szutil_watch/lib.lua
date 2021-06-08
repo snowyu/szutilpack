@@ -90,6 +90,7 @@ local function watch_restore(dtime, wplayer, wname)
 			collisionbox = restore.collisionbox
 		})
 	setprivs(wname, function(x) x.interact = restore.interact end)
+	wplayer:set_pos(restore.pos)
 	if restore.inv then
 		for k, v in pairs(restore.inv) do
 			wplayer:get_inventory():set_list(k, v)
@@ -99,7 +100,6 @@ local function watch_restore(dtime, wplayer, wname)
 	if vector.distance(wplayer:get_pos(), restore.pos) < 16 then
 		wplayer:set_hp(restore.hp or 20)
 	end
-	wplayer:set_pos(restore.pos)
 
 	if data.restore.ttl < 0 then data.restore = nil end
 	return watchdata_set(wplayer, wname, data)
